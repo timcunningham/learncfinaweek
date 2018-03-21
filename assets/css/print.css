@@ -1,0 +1,28 @@
+.navbar,
+footer,
+aside,
+nav,
+#toggle,
+.pager,
+.articleHeader{
+	display:none;
+}
+.articleHeader{
+	display:none !important;
+}
+#printHeader{
+	display:block !important;
+}
+
+p,
+li,
+blockquote{
+	font-size:1.2em;
+}
+
+pre{
+	font-size:1.1em;
+}
+.container .twelve.columns{
+	width:100%;
+}

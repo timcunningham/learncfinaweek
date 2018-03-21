@@ -1,0 +1,164 @@
+<p>
+	In this hands on we will create an Application.cfc file, create some application wide variables and implement some of the Application.cfc event handlers.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Create a new file called Application.cfc  in /www/
+		</li>
+		<li>
+			Open up the /www/Application.cfc file in your code editor. Note: for this hands on we will be doing all our coding in script format.
+		</li>
+		<li>
+			Create a component declaration.  Your code should look similar to this:
+<pre class="prettyprint">
+component{
+}
+</pre>			
+		</li>
+		<li>
+			Create two variables in the this scope called name and datasource.  Set both variables to ‘learncfinaweek’.
+		</li>
+		<li>
+			Create another variable in the this scope called applicationTimeout and give it a value of:
+<pre class="prettyprint">
+CreateTimeSpan(10, 0, 0, 0)
+</pre>
+			
+		</li>
+		<li>
+			Create another variable in the this scope called sessionManagement and set it to true.
+		</li>
+		<li>
+			Create another variable in the this scope called sessionTimeout and give it a value of CreateTimeSpan(0, 0, 30, 0)
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+component{
+	this.name='learncfinaweek';
+	this.datasource='learncfinaweek';
+	this.applicationTimeout = CreateTimeSpan(10, 0, 0, 0);
+	this.sessionManagement = true;
+	this.sessionTimeout = CreateTimeSpan(0, 0, 30, 0);
+}
+</pre>			
+		</li>
+		<li>
+			Create a function called onApplicationStart that accepts no arguments and returns true.
+		</li>
+		<li>
+			Inside the onApplicationStart function create two variables set in the application scope.  The first variable should be called myName and should have the value of your name.  The second variable should be called myPosition and should have the value of 'A Developer'.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+component{
+	this.name='learncfinaweek';
+	this.datasource='learncfinaweek';
+	this.applicationTimeout = CreateTimeSpan(10, 0, 0, 0);
+	this.sessionManagement = true;
+	this.sessionTimeout = CreateTimeSpan(0, 0, 30, 0);
+	
+	function onApplicationStart() {
+		application.myName = 'Simon';
+		application.myPosition = 'A Developer';
+        return true;
+    }
+}
+</pre>			
+		</li>
+		<li>
+			Below the onApplicationStart function create a new function called onRequestStart which accepts one string parameter called targetPage.
+		</li>
+		<li>
+			Inside the function create an if statement that calls the StructKeyExists function.  The structKeyExists function should be passed the URL scope as its first parameter and the string ‘reload’ as its second parameter.
+		</li>
+		<li>
+			Inside the if statement a call should be made to the onApplicationStart function.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+function onRequestStart(string targetPage){
+	if(structKeyExists(url,'reload')){
+		onApplicationStart();
+	}
+ }
+</pre>			
+		</li>
+		<li>
+			Open up the /www/index.cfm file in your code editor.
+		</li>
+		<li>
+			Remove the &lt;cfset&gt; tags at the top of the page.
+		</li>
+		<li>
+			Locate the myName variable output on or around line X and change it to application.myName.
+		</li>
+		<li>
+			Locate the myPosition variable output on or around line X and change it to application.myPosition.
+		</li>
+		<li>
+			In your browser navigate to the /www/index.cfm page.  The index page should display as normal.
+		</li>
+		<li>
+			Go to the /www/application.cfc file in your code editor and change the application.myPosition variable to have the value of ‘A Great Developer’.
+		</li>
+		<li>
+			In your browser, refresh the index.cfm page. Notice that nothing has changed.  This is because the application has already started so the onApplicationStart method does not get called.
+		</li>
+		<li>
+			In your browser append ?reload=1 to the index.cfm in the location bar.  Hit return to load the page.  Notice that the position has now updated to the new value.
+		</li>
+		<li>
+			Open up the /www/resume.cfm file in your code editor. Locate both &lt;cfquery&gt; tags and remove the datasource attributes.
+		</li>
+		<li>
+			In a browser navigate to the /www/resume.cfm page.  Notice that the page loads normally.  Both queries are now using the application wide datasource.
+		</li>
+		<li>
+			In the onApplicationStart function in the /www/Application.cfc file create a new application variable called utilities.  Set the value of application.utilities to CreateObject('Component','cfc.utilities').
+		</li>
+		<li>
+			Your code should look similar to:
+<pre class="prettyprint">
+function onApplicationStart() {
+	application.myName = 'Simon';
+	application.myPosition = 'A Great Developer';
+	application.utilities = CreateObject('Component','cfc.utilities');
+    return true;
+}
+</pre>
+		</li>
+		<li>
+			Open up the /www/about.cfm file in your code editor and remove the &lt;cfset&gt; tag on or around line 4.
+		</li>
+		<li>
+			Locate the utilities.convertStringToASCII function call on or around line 58 and change it to application.utilities.convertStringToASCII.
+		</li>
+		<li>
+			In a browser navigate to the /www/about.cfm page remembering to include ?reload=1 in the url as we have made an application.cfc change.
+		</li>
+		<li>
+			Notice that the page loads normally.  The convertStringToASCII function is now stored in the application scope and can now be accessed from any page within the application.
+		</li>
+	</ol>
+</p>
+<h2>
+	Homework
+</h2>
+<p>
+	<ol>
+		<li>
+			Remove the datasource attribute from all query tags.
+		</li>
+		<li>
+			Update the email address in the /www/contact.cfm file to use the convertStringToASCII function.
+		</li>
+	</ol>
+	
+</p>
+
+

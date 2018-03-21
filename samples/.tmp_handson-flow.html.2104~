@@ -1,0 +1,300 @@
+<p>
+	In this hands on we are going to add some conditional logic to the site as well as create a form post.
+</p>
+<p>
+	<ol>
+		<li>
+			Open up /www/contact.cfm in your code editor
+		</li>
+		<li>
+			Locate the comment that reads <!—Chapter 2 – Step 2 -->
+		</li>
+		<li>
+			Bellow the comment create a cfif statement that checks if the form.submitted variable is true. Your code should look something like this:
+			<pre>
+<cfif form.submitted>
+					
+</cfif>
+			</pre>
+		</li>
+		<li>
+			Inside the cfif tag place the text <p>Your form has been submitted</p>
+		</li>
+		<li>
+			Navigate to the contact.cfm page in your browser
+		</li>
+		<li>
+			Notice that you receive an error stating that Element Submitted is undefined in form”.  This error is thrown because the form.submitted variable does not exist.  When dealing with forms it is important to provide cfparam tags that will create the variable if it is not already present.
+		</li>
+		<li>
+			Go to line 1 of contact.cfm and add the following line of code: <cfparam name="form.submitted" default="0" />
+		</li>
+		<li>
+			Refresh the page and notice that the error has been resolved.
+		</li>
+		<li>
+			Locate the form tag on or around line 107.
+		</li>
+		<li>
+			Update the action attribute to point to contact.cfm
+		</li>
+		<li>
+			Refresh the page in your browser and click the submit button
+		</li>
+		<li>
+			Notice that the form was submitted but the text was not displayed.  This is because the form.submitted value still does not exist and the cfparam is setting that value for us.
+		</li>
+		<li>
+			Locate the closing form tag on or around line 130.
+		</li>
+		<li>
+			Before the closing form tag and a hidden input called submitted and give it a value of 1.  The tag should look similar to: <input type="hidden" name="submitted" value="1" />
+		</li>
+		<li>
+			Refresh the page in your browser and click the submit button.
+		</li>
+		<li>
+			You should now see the text “Your form has been submitted” displayed on the page.
+		</li>
+	</ol>
+</p>
+<p>
+	In the next hands on we are going to validate the form data that was submitted and output any problems that might have occurred.  We will access data from the form scope.
+</p>
+<p>
+	<ol>
+		<li>
+			Locate the comment Chapter 2 - Step 2 in contact.cfm file and remove all the code that is inside the cfif tag just bellow it.
+		</li>
+		<li>
+			Inside the cfif tag create a variable called OK and set it to true.
+		</li>
+		<li>
+			Bellow the cfset create an if statement that checks if the length of the value of form.contactname is equal to 0.  To do that use a function called len, which will return the number of characters in the provided string.  Your code should look similar to this:
+			
+<pre>
+<cfset ok = true />
+					
+<cfif len(form.contactname) eq 0>
+
+</cfif>			
+</pre>
+		</li>
+		<li>
+			Inside the cfif satetement set the OK variable to false.
+		</li>
+		<li>
+You should end up with the following code:
+<pre>
+<cfset ok = true />
+					
+<cfif len(form.contactname) eq 0>
+	<cfset ok = false />
+</cfif>		
+</pre>
+		</li>
+		<li>
+			Create if statements for the email and message fields in the form.
+		</li>
+		<li>
+			After the last cfif statement create a new if statement that checks if the ok value is equal to false.  If it is equal to false output the following: <p>You did not provide all the required information!</p>
+		</li>
+		<li>
+			Your final block of code should look similar to this:
+<pre>			
+<cfif form.submitted>
+	<cfset ok = true />
+					
+	<cfif len(form.contactname) eq 0>
+		<cfset ok = false />
+	</cfif>	
+					
+	<cfif len(form.email) eq 0>
+		<cfset ok = false />
+	</cfif>	
+					
+	<cfif len(form.message) eq 0>
+		<cfset ok = false />
+	</cfif>	
+					
+	<cfif ok eq false>
+		<p>You did not provide all the required information!</p>
+	</cfif>	
+</cfif>
+</pre>
+		</li>
+		<li>
+			Reload contact.cfm in your browser and click on submit.  You should see the message “You did not provide all the required information!” displayed.
+		</li>
+		<li>
+			Fill in all the fields in the form and click submit.  You will notice that the message does not display.
+		</li>
+		<li>
+		
+		</li>
+		<li>
+		
+		</li>
+		<li>
+		
+		</li>
+		<li>
+		
+		</li>
+	</ol>
+</p>
+
+<p>
+	In the next hands on we are going to update our code to provide a better user experience to our users as well as improve our form validation.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Locate the cfparam tag at the top of the contact.cfm file
+		</li>
+		<li>
+			Bellow the cfparam tag, create another one for contactname, email and message.  Leave the default attribute as empty.  Your code should look similar to: 
+<pre>	
+<cfparam name="form.contactname" default="" />
+<cfparam name="form.email" default="" />
+<cfparam name="form.message" default="" />
+</pre>
+		</li>
+		<li>
+			Locate the contactname form input on or around line 130 and add a value attribute with a value of #form.contactname#
+		</li>
+		<li>
+			Locate the email form input on or around line 136 and add a value attribute with the value of #form.email#
+		</li>
+		<li>
+			Locate the message textarea on or around line 142 and place the value #form.message# between the open and close tags.
+		</li>
+		<li>
+			Confirm your code looks similar to: 
+<pre>			
+<div>
+	<label>Name <span class="font-11">(required)</span></label>
+	<input name="contactname" type="text" class="required" value="#form.contactname#"/>
+</div>
+
+
+<div>
+	<label>E-mail <span class="font-11">(required)</span></label>				
+	<input name="email" type="text" class="required email" value="#form.email#"/>		
+</div>
+
+
+<div class="textarea">
+	<label>Message <span class="font-11">(required)</span></label>				
+	<textarea name="message" rows="6" cols="60" class="required">#form.message#</textarea>		
+</div>
+</pre>
+		</li>
+		<li>
+			Locate the open form tag on or around line 126 and put on open cfoutput tag before the form tag.
+		</li>
+		<li>
+			Locate the closing form tag on or around line 149 and put a closing cfoutput tag after the form tag.
+		</li>
+		<li>
+			Reload contact.cfm in your browser and fill in 2 of the 3 inputs of the form and click submit.
+		</li>
+		<li>
+			Notice that the form is now pre populated with the values you submitted and you still receive the message “You did not provide all the required information!”
+		</li>
+		<li>
+			Reload the contact.cfm page in your browser.
+		</li>
+		<li>
+			Add a space in all form fields and click submit.
+		</li>
+		<li>
+			Notice that the message does not display on the page.  This is due to the fact that the form fields do have a length, even though it is just a space.
+		</li>
+		<li>
+			Locate the cfif statement that checks the length of form contactname on or around line 105. 
+		</li>
+		<li>
+			Wrap the form.contactname variable in a trim() function.  This will remove all whitespace at the beginning and end of the variable.
+		</li>
+		<li>
+			Your code should look similar to:
+<pre>
+	<cfif len(trim(form.contactname)) eq 0>
+</pre>			
+		</li>
+		<li>
+			Add the trim function to the form.email and form.message cfif statements
+		</li>
+		<li>
+			Reload contact.cfm in your browser and add spaces to all 3 form fields.  Notice that the message is displayed.
+		</li>
+	</ol>
+</p>
+
+<p>
+	In our next hands on we are going to refactor our code and take out any unessary logic we might have.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up contact.cfm in your code editor and locate the cfif statement that checks the form.contactname variable and remove the “eq 0” part of the expression.  As any number greater than 0 is treated as true, and the number 0 is treated as false, we do not need this additional part of the cfif statement.
+		</li>
+		<li>
+			Remove the “eq 0” part of the form.email and form.message cfif statemeents
+		</li>
+		<li>
+			Locate the cfif statements that checks the variable OK on or around line 116.
+		</li>
+		<li>
+			Remove the “eq false” part of the expression.  As a cfif tag is looking for a true or false value, we do not need to check the value of the variable as it is already going to be a true or false value.
+		</li>
+		<li>
+			Before the closing cfif tag of the expression that checks the OK variable, insert a <cfelse> tag.
+		</li>
+		<li>
+			Between the <cfelse> tag and the closing </cfif> tag add the following code: <p>Form submitted successfully!</p>
+		</li>
+		<li>
+			Your final code block should look similar to this:
+<pre>			
+<cfif form.submitted>
+	<cfset ok = true />
+	
+	<cfif len(trim(form.contactname))>
+		<cfset ok = false />
+	</cfif>	
+	
+	<cfif len(trim(form.email))>
+		<cfset ok = false />
+	</cfif>	
+	
+	<cfif len(trim(form.message))>
+		<cfset ok = false />
+	</cfif>	
+	
+	<cfif ok>
+		<p>You did not provide all the required information!</p>
+	<cfelse>
+		<p>Form submitted successfully!</p>	
+	</cfif>	
+</cfif>
+</pre>	
+		</li>
+		<li>
+			Reload contact.cfm in your browser and enter spaces in all form fields.
+		</li>
+		<li>
+			Click submit and notice that the message “You did not provide all the required information!” message is displayed.
+		</li>
+		<li>
+			Provide information for all the form fields and click submit.
+		</li>
+		<li>
+			Notice that the message “Form submitted successfully!” is displayed.
+		</li>
+	
+	</ol>
+</p>

@@ -1,0 +1,37 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-autowire="byName">
+	
+	<!-- DAO Components -->
+	<bean id="authorDAO" class="com.dao.AuthorDAO" />
+	<bean id="courseDAO" class="com.dao.CourseDAO" />
+		
+	<!-- Service Components - Utility, these are to be injected where needed for misc tasks -->
+
+	<bean id="utilityORMService" class="com.service.UtilityORMService">
+		<property name="entityServiceMapping">
+			<map>
+				<entry key="author"><value>authorService</value></entry>
+				<entry key="administrator"><value>authorService</value></entry>
+				<entry key="chapter"><value>courseService</value></entry>
+				<entry key="page"><value>courseService</value></entry>
+				<entry key="section"><value>courseService</value></entry>
+				<entry key="version"><value>courseService</value></entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="requestCacheService" class="com.service.RequestCacheService" />
+	<bean id="parentService" abstract="true">
+		<property name="requestCacheService"><ref bean="requestCacheService" /></property>
+	</bean>
+	
+	<!-- Service Components - Main -->
+	
+    <bean id="authorService" parent="parentService" class="com.service.AuthorService">
+        <property name="DAO"><ref bean="authorDAO" /></property>
+    </bean>
+	<bean id="courseService" parent="parentService" class="com.service.CourseService">
+        <property name="DAO"><ref bean="courseDAO" /></property>
+    </bean>
+</beans>

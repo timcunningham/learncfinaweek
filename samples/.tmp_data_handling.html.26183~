@@ -1,0 +1,413 @@
+Databases
+
+<p>
+	One of the key parts of any application is it’s ability to do CRUD (Create Read Update and Delete) operations.  ColdFusion has the ability to read a variety of datasources with minimal effort. There is built in support for over 10 different databases.  Among the supported databases you will find MS SQL, MySql, Oracle, DB2, and Sybase. There are slight sql syntax differences in interacting with the database. However, more often than not, the same code can be used against different databases without any changes.
+</p>
+
+<blockquote>
+	<strong>Note:</strong> This chapter will not tech you how to write sql.  However, it will show you how to take the sql skills you have and incorporate them into your code.  Alternatively, if you are using ColdFusion Builder you can use the query builder to assist you with query creation.
+</blockquote>
+
+<h2>
+	Query Basics
+</h2>
+<p>
+	To begin with, a datasource needs to be configured in the administrator. If you installed the samples when you installed ColdFusion then there are some for you to play with already.  Once you have the datasource created you can then start to do CRUD operations.
+</p>
+
+<h3>
+	Creating a datasource:
+</h3>
+
+
+<p>
+	<ul>
+		<li>
+			Login to ColdFusion Administrator
+		</li>
+		<li>
+			On left menu under "Data & Services" select "Data Sources"
+		</li>
+		<li>
+			Under "Add New Data Source" enter a name (this will be the name you will use in your code to reference the data source), select a driver type. The type must * match the database type you are using.
+		</li>
+		<li>
+			Click "Add" to submit the form.
+		</li>
+		<li>
+			The next screen will vary depending on datasource type. The following steps are based on selecting "MySQL (4/5)" as a type.
+		</li>
+		<li>
+			Enter database name (Name of your database on your server)
+		</li>
+		<li>
+			Enter Server (ip address or domain name of server)
+		</li>
+		<li>
+			Port is defaulted but change it if necessary
+		</li>
+		<li>
+			Enter username (this is the login that will be tied to all database actions from your application)
+		</li>
+		<li>
+			Enter Password
+		</li>
+		<li>
+			Enter a description if necessary.
+		</li>
+		<li>
+			Not a requirement but you can click on "advanced settings" and make any adjustments there.
+		</li>
+		<li>
+			Click "Submit" to save.
+		</li>
+		<li>
+			The datasource will validate and if there are any errors they will be reported on screen.
+		</li>
+		<li>
+			If necessary correct any errors until the datasource validates upon save.
+		</li>
+	</ul>
+</p>
+
+<h3>
+	Basic query:
+</h3>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt; 
+    select * from ARTISTS 
+&lt;/cfquery&gt;
+</pre>
+<p>
+	The query result is stored in a variable that is the same name as they query name. To see the result of the query you can just dump the result.
+</p>
+<pre class="prettyprint">
+&lt;cfdump var="#myQuery#" /&gt;
+</pre>	
+<p>
+	The dump will contain information on caching status, execution time, actual sql statement, and the entire result set.  Now, don’t let the dump confuse you.  The result is not stored in a “resultset” variable.  That is just how cfdump shows it.
+</p>	
+
+<p>
+	There is other info about the query that cfdump does not display but are part of the myquery object.  For example, columnlist and recordcount.  These can be referenced by using myquery.columnlist or myquery.recordcount.
+</p>
+
+<h4>
+	Performance tip:
+</h4>
+
+<p>
+	The query should only return the columns you need.  This greatly speeds up the query and return processing.  For example, since the output in the above example only used email, firstname, and lastname the query should be changed from "select *" to "select email, firstname, and lastname".
+</p>
+
+<h2>
+	Query output
+</h2>
+
+<p>
+	While CFDump is a great way to make sure the query, is working it isn’t very useful for output to a user.  Using cfoutput we now gain display control and can display what we want how we want it.
+</p>
+
+<pre class="prettyprint">
+&lt;cfoutput query="myQuery"&gt;
+    #myquery.CurrentRow# - #myquery.email# - #myquery.firstname# - #myquery.lastname#&lt;br /&gt;
+&lt;/cfoutput&gt;
+</pre>
+
+<p>
+	There are times where you may wish to process the query return but not directly output it. This can be accomplished by using CFLoop. This tag allows you to loop over the result set and perform operations per row (and output them too). It is also useful in the event that you wish to loop over a query result and there is already an outer CFOutput in the code. The syntax looks identical to CFOutput.
+</p>
+<pre class="prettyprint">
+&lt;cfset artistArray = [] /&gt;
+&lt;cfloop query="myQuery"&gt;
+    &lt;cfset arrayappend(artistArray, myquery.lastname & ', ' & myQuery.firstname) /&gt;
+&lt;/cfloop&gt;
+</pre>
+<h2>
+	Query Output Grouping
+</h2>
+
+<p>
+	It is also possible to next CFOutput tags so you can group like data. This creates a nested loop where the outer loop is iterated once per group and the inner is looped once for each item in the group. While this sounds great on the surface it does have a drawback. The data must be pre-sorted before the CFOutput for the grouping to work correctly. In the example below an order by is added to the query. That makes sure that the rows come back in the correct order. Then the CFOutput tag now has a group attribute. The value of this attribute must always be a column name of the query. Then inside the CFOutput is another CFOutput. This is the inner loop that will output once per row in the group. The outer will only output once.
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt; 
+    select * from ART
+    order by issold
+&lt;/cfquery&gt;
+
+&lt;cfoutput Query="myQuery" group="issold"&gt;
+    &lt;p&gt;
+    	Sold ?: #YesNoFormat(myQuery.issold)#:&lt;br /&gt;
+    &lt;blockquote&gt;
+	    &lt;cfoutput&gt;
+	        #myQuery.artname#: #DollarFormat(myQuery.price)#&lt;br /&gt;        
+	    &lt;/cfoutput&gt;
+    &lt;/blockquote&gt;
+    &lt;/p&gt;
+    &lt;hr /&gt;
+&lt;/cfoutput&gt;
+</pre>
+<h2>
+	Query Param
+</h2>
+
+<p>
+	One of the biggest attacks against a system is sql injection.  However, one of the easiest ways to prevent it is to use cfqueryparam.  This parameterizes the query input thus making injection nearly impossible.  Using cfqueryparam should be used anywhere you have query input.  CFQueryparam is not exclusive to select where clauses.  It should also be used for inserts, updates, or any query that has dynamic input.
+</p>
+
+<p>
+	CFQueryparam is also useful in doing data length validation as well as data type.  For example, if your queryparam is set as an integer and a string is passed an error will be thrown.  The same is true when a string is longer than the set max length.
+</p>
+
+<p>
+	<strong>Note: cfqueryparam should be used ALWAYS without exception.</strong>
+</p>
+
+<p>
+	Query Example:
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt;  
+    select * from ARTISTS
+    where firstname = &lt;cfqueryparam value="#form.name#" cfsqltype="cf_sql_varchar" /&gt;
+&lt;/cfquery&gt;
+</pre>
+<p>
+	If you have debugging enabled the query output in the debug info will look a little different.
+</p>
+<pre class="prettyprint">
+myQuery (Datasource=cfartgallery, Time=1ms, Records=1) i
+
+    select * from ARTISTS
+    where firstname = ?
+
+Query Parameter Value(s) -
+Parameter #1(cf_sql_varchar) = Austin
+</pre>
+
+<p>
+	Notice the “?” in the where clause?  That is the parameter that was created using cfqueryparam. You can also use it to replace a list in an “in” clause.
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt;  
+    select * from ARTISTS
+    where artistid in (&lt;cfqueryparam value="#form.ids#" list="true" /&gt;)
+&lt;/cfquery&gt;
+
+
+myQuery (Datasource=cfartgallery, Time=2ms, Records=4) i
+select * from ARTISTS
+where artistid in (?,?,?,?)
+Query Parameter Value(s) -
+Parameter #1(CF_SQL_CHAR) = 1
+Parameter #2(CF_SQL_CHAR) = 2
+Parameter #3(CF_SQL_CHAR) = 3
+Parameter #4(CF_SQL_CHAR) = 4
+</pre>
+<h2>
+	Query Caching
+</h2>
+
+<p>
+	Query caching is very easy to implement. Caching will be covered in detail in a later chapter. We will just touch on one way to cache here, cachedwithin.  This type of cache states that the query result will be stored and reused for the specified duration.  Using the previous query example, caching the result can be done like this.
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery" cachedwithin="#createTimespan(0,1,0,0)#"&gt; 
+    select * from ARTISTS 
+&lt;/cfquery&gt;
+</pre>
+<p>
+	This would cause the query result to cache for 1 hour.  Caching is based on the query syntax not the query name.  So, as long as the syntax doesn’t change then the cache will be used.  But, if you have a very dynamic query, caching can be a challenge.  For example, if the below is your query you might not want to cache it.  This is because the sql syntax can vary widely from request to request. Using CFQueryparam does not help in caching at the ColdFusion server level. However, it does assist with database query plans so there is some caching benefit.
+</p>
+
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery" cachedwithin="#createTimespan(0,1,0,0)#"&gt;    
+    select firstname, lastname, email from ARTISTS  
+    where firstname = &lt;cfqueryparam value="#form.firstname#" cfsqltype="cf_sql_varchar" /&gt;
+&lt;/cfquery&gt;
+</pre>
+
+<h2>
+	Dynamic Queries
+</h2>
+
+<p>
+	Queries are not always straight forward. There may be occurrences where a where clause or a column list needs to be decided upon at runtime. Thankfully, CFQuery allows for wide range of dynamics to create the query. Think of it like you are generating browser output without any markup or CFOutput tags, like a paragraph of text. So, knowing that, we can use a variety of ways to generate a dynamic query.
+</p>
+
+<h3>
+	cftags inside CFQuery
+</h3>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt;  
+    select firstname, lastname, email from ARTISTS  
+    where 1 = 1
+     &lt;cfif structkeyExists(form, 'firstname') and len(form.firstname)&gt;
+        and firstname = &lt;cfqueryparam value="#form.firstname#" cfsqltype="cf_sql_varchar" /&gt;
+    &lt;/cfif&gt;
+    &lt;cfif structkeyExists(form, 'lastname') and len(form.lastname)&gt;
+        and lastname = &lt;cfqueryparam value="#form.lastname#" cfsqltype="cf_sql_varchar" /&gt;
+    &lt;/cfif&gt;
+&lt;/cfquery&gt;
+</pre>
+<h3>
+	Generating sql string outside query
+</h3>
+<pre class="prettyprint">
+&lt;cfset query = 'select firstname, lastname, email from ARTISTS' /&gt;
+
+&lt;cfquery name="myQuery" datasource="cfartgallery"&gt;  
+    #query#
+&lt;/cfquery&gt;
+</pre>
+<h2>
+	Limiting result counts
+</h2>
+
+<p>
+	Returning thousands (as an example) of rows from a query can be very inefficient. Also, it is good practice to only return the number of rows you are going to deal with. Reducing the result set to a defined number of rows can be done in a variety of ways. You could add a maxrows to the output. You could add a max count to the sql statement itself. Also, you could add a max to the CFQuery tag itself. All of these are actually valid ways to handle it. Deciding how to handle the result can be a challenge. Adding a limiter to the CFQuery tag or in the sql statement limits the rows from the database. But, the max rows on the output just reduces the output. So, if you query returned 10,000 rows your output could have a max of 100 so only the first 100 are displayed.
+</p>
+
+<pre class="prettyprint">
+&lt;cfoutput query="myQuery" maxrows="100"&gt;
+    #myquery.CurrentRow# - #myquery.email# - #myquery.firstname# - #myquery.lastname#&lt;br /&gt;
+&lt;/cfoutput&gt;
+</pre>
+
+<p>
+	The issue with this is that there were 9,900 rows of ignored data. The better approach maybe be to have the database only return 100 rows. This can be done by setting a max on the initial query.
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="myQuery" datasource="cfartgallery" maxrows="100"&gt;   
+    select firstname, lastname, email from ARTISTS
+&lt;/cfquery&gt;
+</pre>
+<p>
+	This way is much more efficient as less data is transmitted from database to server. This also helps speed things up as ColdFusion no longer has to deal with query data that is not being used.
+</p>
+
+<h2>
+	Insert and identity retrieval
+</h2>
+
+<p>
+	More often than not when inserting a records you are going to want to know the id of the inserted item. Typically this is achieved by doing the insert then doing a select and getting the highest id in the table. While this may work, it is very problematic and may not yield the expected results. Thankfully there is an alternative that works very well and yields the correct results. Look at the example below.
+</p>
+<pre class="prettyprint">
+&lt;cfquery result="qryResult" datasource="cfartgallery"&gt;
+    insert into ART
+    (
+        ARTISTID, ARTNAME, DESCRIPTION, ISSOLD, LARGEIMAGE, MEDIAID, PRICE
+    )
+    values
+    (
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="Test Item" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="Test Desc" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="img.png" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;
+    )  
+&lt;/cfquery&gt;
+
+&lt;cfdump var="#qryResult#" /&gt;
+</pre>	
+<p>
+	Notice in the example above we add a result attribute and give it a value of "qryResult". This variable is a dumpable structure of data. One of the parts of the data is the id of the inserted row. It also will contain the params (if any), execution time, and the sql statement. Depending on your database the identity variable may be different so dump the result first to see what the column is.
+</p>	
+
+<h2>
+	Queries in CFScript
+</h2>
+
+<p>
+	There is also a way to run queries if you really like writing all your code in script syntax. It is slightly more complicated but has all the same functionality that the tag based syntax has. There are many ways to implement using queries in script. The example below is just one of those ways. The one main difference is that with script based query you actually have to tell ColdFusion to execute the query. The query doesn't just run by creating it. Also, it will be necessary to get the query result by using the gerResult() function.
+</p>
+
+<h3>
+	Basic Example
+</h3>
+	
+<pre class="prettyprint">
+myQry = new Query();
+myQry.setDatasource("cfartgallery"); 
+myQry.setSQL("select firstname, lastname, email from ARTISTS");
+myQuery = myQry.execute();
+writeDump(myQuery.getResult());
+writeDump(myQuery.getPrefix());
+</pre>
+
+<h3>
+	Streamlined Example
+</h3>
+
+<p>
+	Using chaining and adding params to the query init the code can be reduced to a single line.
+</p>
+
+<pre class="prettyprint">
+myQueryResult = new Query(sql="select firstname, lastname, email from ARTISTS", datasource="cfartgallery").execute().getResult();
+writeDump(myQueryResult);
+</pre>
+
+<h3>
+	Using query params
+</h3>
+
+<p>
+	Just like the tag based version you can easily add query params to the query. For the script syntax you have to define a matching pair. That is the param name in the query and the added param must match. If they don't match an error will be thrown.
+</p>
+
+<pre class="prettyprint">
+myQry = new Query();
+myQry.setDatasource("cfartgallery"); 
+myQry.setSQL("select artname, description from ART where issold = :sold");
+myQry.addParam(name: "sold", value: "1", cfsqltype: "CF_SQL_INT");
+myQuery = myQry.execute();
+writeDump(myQuery.getResult());
+writeDump(myQuery.getPrefix());
+</pre>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

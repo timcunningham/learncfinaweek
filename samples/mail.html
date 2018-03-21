@@ -1,0 +1,491 @@
+﻿<h2>
+	Configure Mail Settings
+</h2>
+
+<p>
+	Before you can send emails with ColdFusion, a mail server you want to use needs to be set. Configuring the mail server can be done in the ColdFusion Administrator.
+</p>
+<p>
+	If you do not have a mail server of your own, your localhost can act as a mail server. ColdFusion will act normally, but since there is no mail server set up on your localhost, emails will not arrive at their destination. Another option is to use the mail server of Gmail (a Gmail account is required for this). The settings for this mail server can be found at the end of this section.
+</p>
+
+<h3>
+	Mail Server Settings
+</h3>
+
+<p>
+	In the ColdFusion Administrator, on the left menu, below "server settings," you will find "Mail." To configure the mail server, specify the host name or IP address of the mail server in the first field. In case the mail server requires authentication, you will need to provide a "user name" and "password" as well.
+</p>
+<p>
+	The "verify mail server connection" option should be selected so that you will be informed if ColdFusion finds the mail server after you saved the settings. Do not enable this option when you use localhost as your mail server.
+</p>
+<p>
+	The default port of a mail server is port 25. If this is not the case for your mail server, you can provide the correct port for your mail server.
+</p>
+
+<p>
+	Now that you have configured the mail server, save the settings by clicking the "Submit Changes"-button at the bottom right (or top right).
+</p>
+<p>
+	When you enabled the "verify mail server connection" option, ColdFusion will inform you if it was able to connect to the mail server. If ColdFusion was able to connect to the mail server, you are done. If not, review the settings or choose a different mail server.
+</p>
+
+<h3>
+	Gmail Mail Server Settings
+</h3>
+
+<p>
+	<ul>
+		<li>
+			<strong>Mail server</strong>: smtp.gmail.com
+		</li>
+		<li>
+			<strong>User name</strong>: your Gmail email address
+		</li>
+		<li>
+			<strong>Password</strong>: your Gmail password
+		</li>
+		<li>
+			<strong>Enable TLS</strong>: yes
+		</li>
+	</ul>
+</p>	
+<p>
+	Please note that Gmail will automatically rewrite the "from" email address to your gmail address.
+</p>
+
+<h2>
+	Send Email
+</h2>
+
+<p>
+	For sending emails ColdFusion provides the cfmail tag. The tag has three required attributes:
+</p>
+
+<p>
+	<ul>
+		<li>
+			<strong>From</strong> - the email address from which you want to send the email.
+		</li>
+		<li>
+			<strong>To</strong> - the email address to which you want to send the email.
+		</li>
+		<li>
+			<strong>Subject</strong> - the subject of the email.
+		</li>
+	</ul>
+</p>
+
+<p>
+	The content of your email will be placed between the opening and closing tag:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="My first email sent with ColdFusion"&gt;
+   Hello,
+   This is my first email sent with ColdFusion!
+&lt;/cfmail&gt;
+</pre>
+
+<p>
+	Sending a copy or a blind copy of your email to someone can be done via the "cc" attribute and "bcc" attribute. Like the "to" attribute, specify a valid email address:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" cc="cc@domain.com" bcc="bcc@domain.com" subject="My first email sent with ColdFusion"&gt;
+   Hello,
+   This is my first email sent with ColdFusion!
+&lt;/cfmail&gt;
+</pre>
+
+<h3>
+	Multiple Recipients
+</h3>
+
+<p>
+	If you want the email to be sent to multiple people at once, you can specify all email addresses as a comma-separated list in the "to" attribute:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to01@domain.com,to02@domain.com" subject="An email sent to multiple people"&gt;
+   Hello,
+   This is an email sent to multiple people!
+&lt;/cfmail&gt;
+</pre>
+
+<h3>
+	HTML Email
+</h3>
+
+<p>
+	Text emails are simple and easy, but sometimes you need more control over the presentation of your email, such as with a newsletter or a promotional email. What you then need is an HTML email.
+</p>
+<p>
+	Add the "type" attribute to your cfmail tag and give it the value "html".  Now you can use HTML in the body of your email.:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="My first HTML email sent with ColdFusion" type="html"&gt;
+   &lt;html&gt;
+        &lt;head&gt;
+           &lt;style type="text/css"&gt;
+           body { 
+	           font-family:sans-serif;
+	           font-size:12px;
+	           color:navy;
+           }
+           &lt;/style&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+           &lt;p&gt;Hello,&lt;/p&gt;
+           &lt;p&gt;This is my first HTML email sent with ColdFusion!&lt;/p&gt;
+           &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+       &lt;/body&gt;
+   &lt;/html&gt;
+&lt;/cfmail&gt;
+</pre>
+
+<p>
+	The email client of the recipient will render the html and display it to the recipient.
+</p>
+
+<p>
+	HTML emails are very powerful, but there are two things you need to know:
+</p>
+<p>
+	<ul>
+		<li>
+			Not all email clients support all features of HTML; some only support the very basics features of HTML.
+		</li>
+		<li>
+			Not all email clients support HTML emails or the recipient disabled HTML emails in their email client.
+		</li>
+	</ul>
+</p>
+
+<p>
+	In those cases, the recipient will see the source code of your HTML email, which is not always readable.
+</p>
+
+<p>
+	More information on the first issue can be found at <a href="http://www.emailology.org" target="_new">www.emailology.org</a>, including an email boilerplate, tips and tricks, and a list of what’s supported by which email clients.
+</p>
+<p>
+	For the second issue, there is an easy solution: send an email with both text and HTML.
+</p>
+
+<h3>
+	HTML and Text Email
+</h3>
+
+<p>
+	The best way to make sure that the recipient of your email will receive the right version for his email client is to send both a text and an HTML version of the email.  This can be done by adding two cfmailpart tags to the body of your email. The only required attribute of this tag is the "type" attribute that specifies which version the cfmailpart represents: "text" for the text email and "html" for the HTML email.
+</p>
+<p>
+	An optional attribute for the cfmailpart tag with the "type" attribute set to "text" is "wraptext." This attribute specifies the maximum line length, in characters of the mail text:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="My first email sent with ColdFusion" type="html"&gt;
+
+   &lt;cfmailpart type="text" wraptext="60"&gt;
+       Hello,
+       This is my first text and HTML email sent with ColdFusion!
+       Email sent by ColdFusion
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailpart type="html"&gt;
+       &lt;html&gt;
+            &lt;head&gt;
+                &lt;style type="text/css"&gt;
+                body { 
+               font-family:sans-serif;
+               font-size:12px;
+               color:navy;
+               }
+               &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+           &lt;p&gt;Hello,&lt;/p&gt;
+           &lt;p&gt;This is my first text and HTML email sent with ColdFusion!&lt;/p&gt;
+           &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+           &lt;/body&gt;
+       &lt;/html&gt;
+   &lt;/cfmailpart&gt;
+&lt;/cfmail&gt;   
+</pre>
+
+<h3>
+	Adding Attachments
+</h3>
+
+<p>
+	By using the cfmailparam tag inside your cfmail tag, you can add attachments to your email:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="Q1 Financial Results" type="html"&gt;
+
+   &lt;cfmailpart type="text" wraptext="60"&gt;
+       Dear,
+       In attachment you will find the financial results of Q1.
+       Email sent by ColdFusion
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailpart type="html"&gt;
+       &lt;html&gt; 
+           &lt;head&gt;
+                &lt;style type="text/css"&gt; 
+               body { 
+               font-family:sans-serif;
+               font-size:12px;
+               color:navy;
+               }
+               &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+               &lt;p&gt;Dear,&lt;/p&gt;
+               &lt;p&gt;In attachment you will find the financial results of Q1.&lt;/p&gt;
+               &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+           &lt;/body&gt;
+       &lt;/html&gt;
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailparam file="c:\Documents\Q1FinancialResults.pdf"&gt;
+
+&lt;/cfmail&gt;
+</pre>
+
+<p>
+	Through the optional "type" attribute, you can indicate what the MIME media type of the attachment is; with the optional "disposition" attribute, you can indicate if you want the attachment to be presented inline ("inline") or as an attachment ("attachment"):
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="Q1 Financial Results" type="html"&gt;
+
+   &lt;cfmailpart type="text" wraptext="60"&gt;
+       Dear,
+       In attachment you will find the financial results of Q1.
+       Email sent by ColdFusion
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailpart type="html"&gt;
+       &lt;html&gt; 
+           &lt;head&gt;
+                &lt;style type="text/css"&gt; 
+               body { 
+               font-family:sans-serif;
+               font-size:12px;
+               color:navy;
+               }
+               &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+               &lt;p&gt;Dear,&lt;/p&gt;
+               &lt;p&gt;In the attachment you will find the financial results of Q1.&lt;/p&gt;
+               &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+           &lt;/body&gt;
+       &lt;/html&gt;
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailparam file="c:\Documents\Q1FinancialResults.pdf" type="application/pdf" attachment="attachment"&gt;
+
+&lt;/cfmail&gt;
+</pre>
+
+<p>
+	For a list of all registered MIME media types, visit <a href="http://www.iana.org/assignments/media-types/" target="_new">www.iana.org/assignments/media-types</a>.
+</p>
+
+<h3>
+	Send Bulk Emails
+</h3>
+
+<p>
+	When you want to send an email to a lot of people, using the "to" attribute of the cfmail -tag is not recommended. Several mail clients and mail servers will mark the message a SPAM when sending it to a large quantity of people;  you may also not want to share the list of email addresses with your recipients.
+</p>
+<p>
+	By providing the cfmail tag with a query result that contains the email addresses, every recipient will receive a personal email:
+</p>
+
+<pre class="prettyprint">
+&lt;cfquery name="getList"&gt; 
+   SELECT email 
+   FROM stockholders
+&lt;/cfquery&gt;
+
+&lt;cfmail query="getList" from="from@domain.com" to="#email#" subject="Q1 Financial Results" type="html"&gt;
+
+   &lt;cfmailpart type="text" wraptext="60"&gt;
+       Dear,
+       In attachment you will find the financial results of Q1.
+       Email sent by ColdFusion
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailpart type="html"&gt;
+       &lt;html&gt; 
+           &lt;head&gt; 
+               &lt;style type="text/css"&gt; 
+               body { 
+               font-family:sans-serif;
+               font-size:12px;
+               color:navy;
+               }
+               &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+               &lt;p&gt;Dear,&lt;/p&gt;
+               &lt;p&gt;In the attachment you will find the financial results of Q1.&lt;/p&gt;
+               &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+           &lt;/body&gt;
+       &lt;/html&gt;
+   &lt;/cfmailpart&gt;
+
+   &lt;cfmailparam file="c:\Documents\Q1FinancialResults.pdf" type="application/pdf" attachment="attachment"&gt;
+
+&lt;/cfmail&gt;
+</pre>
+
+<p>
+	You can personalize the email even more by passing additional information to the cfmail tag through the query result:
+</p>
+
+<pre class="prettyprint">
+&lt;cfquery name="getList"&gt; 
+   SELECT email 
+   FROM stockholders
+&lt;/cfquery&gt;
+
+&lt;cfmail query="getList" from="from@domain.com" to="#email#" subject="Q1 Financial Results" type="html"&gt;
+
+&lt;cfmailpart type="text" wraptext="60"&gt;
+   Dear #firstname# #lastname#,
+   In the attachment you will find the financial results of Q1.
+   Email sent by ColdFusion
+&lt;/cfmailpart&gt;
+
+&lt;cfmailpart type="html"&gt;
+   &lt;html&gt; 
+       &lt;head&gt;
+            &lt;style type="text/css"&gt; 
+           body { 
+           font-family:sans-serif;
+           font-size:12px;
+           color:navy;
+           }
+           &lt;/style&gt; 
+       &lt;/head&gt; 
+       &lt;body&gt;
+           &lt;p&gt;Dear #firstname# #lastname#, &lt;/p&gt;
+           &lt;p&gt;In the attachment you will find the financial results of Q1.&lt;/p&gt;
+           &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+       &lt;/body&gt;
+   &lt;/html&gt;
+&lt;/cfmailpart&gt;
+
+&lt;cfmailparam file="c:\Documents\Q1FinancialResults.pdf" type="application/pdf" attachment="attachment"&gt;
+
+&lt;/cfmail&gt;
+</pre>
+
+<h2>
+	Using cfscript
+</h2>
+
+<p>
+	In you prefer to writing in script over tags, you can use cfscript to send emails. ColdFusion provides a wrapper around the cfmail tag that is automatically available.
+</p>
+<p>
+	Create a new Mail object.
+</p>
+
+<pre class="prettyprint">
+email = new Mail();
+</pre>
+
+<p>
+	Set all properties through the setters.
+</p>
+
+<pre class="prettyprint">
+email.setFrom("from@domain.com");
+email.setTo("to@domain.com)";
+email.setSubject("My first email sent with cfscript");
+</pre>
+
+<p>
+	Add the mail parts for text and html.
+</p>
+
+<pre class="prettyprint">
+email.addPart( type="text", wraptext="60", body="
+   Dear,
+   In the attachment you will find the financial results of Q1.
+   Email sent by ColdFusion
+");
+
+email.addPart( type="html", body="
+   &lt;html&gt;
+       &lt;head&gt;
+           &lt;style type="text/css"&gt;
+           body { 
+           font-family:sans-serif;
+           font-size:12px;
+           color:navy;
+           }
+           &lt;/style&gt;
+       &lt;/head&gt;
+       &lt;body&gt;
+           &lt;p&gt;Dear #firstname# #lastname#, &lt;/p&gt;
+           &lt;p&gt;In the attachment you will find the financial results of Q1.&lt;/p&gt;
+           &lt;p&gt;Email sent by &lt;a href="http://www.coldfusion.com" &gt;&lt;img src="http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/images/shared/product-totems/80x80/totem-coldfusion-10-80x80.png" alt="ColdFusion" /&gt;&lt;/a&gt;&lt;/p&gt;
+       &lt;/body&gt;
+   &lt;/html&gt;
+");
+</pre>
+
+<p>
+	Add the attachment.
+</p>
+
+<pre class="prettyprint">
+mail.addParam(file="c:\Documents\Q1FinancialResults.pdf", type="application/pdf", attachment="attachment");
+</pre>
+
+<p>
+	The last step is to send the email by using the send method of the Mail object.
+</p>
+
+<pre class="prettyprint">
+email.send();
+</pre>
+
+<p>
+	If you want to take a look at the wrapper, you will find it at the following location: [CF root]/cfusion/CustomTags/com/adobe/coldfusion/mail.cfc.
+</p>
+
+<h2>
+	View Undelivered Mail
+</h2>
+
+<p>
+	ColdFusion saves a copy of all undelivered emails in a special folder ([CF root]/Mail/undelivr/). The ColdFusion Administrator has an interface to this folder for easier browsing.  To view the undelivered emails, open the ColdFusion Administrator. In the left menu, below "server settings," you will find "Mail". In the "Mail Spool Settings" section, click the "View Undelivered Mail" button.
+</p>
+<p>
+	This page displays a list of all undelivered email. You can delete these emails through the "delete" button, or resend them using the "respool" button.
+</p>
+
+<h2>
+	Overwrite Default Mail Server Settings
+</h2>
+
+<p>
+	Sometimes you may want to use a different mail server than the one set up in the ColdFusion Administrator, or perhaps you don’t have access to the ColdFusion Administrator. In these situations, you can specify the mail server settings directly in the cfmail tag through the "server" attribute, "port" attribute, "username" attribute, and "password" attribute:
+</p>
+
+<pre class="prettyprint">
+&lt;cfmail from="from@domain.com" to="to@domain.com" subject="An email sent with an alternative mail server" server="localhost"&gt;
+   Hello,
+   This is an email sent with an alternative mail server!
+&lt;/cfmail&gt;
+</pre>

@@ -1,0 +1,176 @@
+<p>
+	To be able to program in ColdFusion the first thing you need to do is install a ColdFusion server.  There are a couple of options available to you but the one that we are going to focus on is a local development server.  
+</p>
+
+<p>
+	A local development server is free and allows you to develop ColdFusion applications that use all of ColdFusions available features.  There are, however, a few limitations, such as not being able to use the server as an external web server.  That being said, there are additional benefits to using a local ColdFusion development server, such as not needing to have IIS or apache installed but instead using the packaged web server.
+</p>
+
+<p>
+	To install ColdFusion, follow the steos bellow:
+</p>
+
+<h2>
+	Windows
+</h2>
+
+<p>
+	<ol>
+		<li>
+			Open up a web browser and go to: <a href="http://www.adobe.com/go/trycoldfusion/" target="_new">http://www.adobe.com/go/trycoldfusion/</a>
+		</li>
+		<li>
+			Sign in with your Adobe ID.  If you do not have an Adobe account, click on the big yellow "Create an Adobe account" button on the left.
+		</li>
+		<li>
+			Scroll half way down the page and select the appropriate version of ColdFusion.  If you have a 64 bit system select 'English | Windows 64 bit' else select 'English | Windows'
+		</li>
+		<li>
+			Click Download
+		</li>
+		<li>
+			Save the file to your desktop
+		</li>
+		<li>
+			Once downloaded, double click the file
+		</li>
+		<li>
+			Click Next
+		</li>
+		<li>
+			Accept the terms and click next
+		</li>
+		<li>
+			When you see the screen bellow, select Developer Edition and click next: <br />
+			<img src="/assets/img/install/windows/screen3.png" border="0" />
+		</li>
+		<li>
+			Select Server configuration and click Next
+		</li>
+		<li>
+			Leave all checkboxes selected and click Next
+		</li>
+		<li>
+			Leave the Enable Secure Profile checkbox unchecked and click Next
+		</li>
+		<li>
+			Provide a password and click Next. Make sure you remember the password!
+		</li>
+		<li>
+			Leave the location at C:\ColdFUsion10 and click Next.  If you want to install in a different location you can, but it is important to note that the install instructions will always reference C:\ColdFusion10.
+		</li>
+		<li>
+			Select 'Built-in web server (Development use only)' and click Next
+		</li>
+		<li>
+			Provide a password and click Next.  Make sure you remember the password, you will need this later on in the install process.
+		</li>
+		<li>
+			Select 'Enable RDS', provide a password and click Next. Make sure you remember the password!
+		</li>
+		<li>
+			Leave the 'Automatically check for server updates' selected and click Next.
+		</li>
+		<li>
+			Click Install
+		</li>
+		<li>
+			If you receive any windows firewall messages pop up, click 'Allow'
+		</li>
+		<li>
+			When the installation wizard is done keep the 'Launch teh Configuration Wizard in the default browser' selected and click Done.
+		</li>
+		<li>
+			A browser window will open. Enter your ColdFusion Administrator Password and click Login. (This is the password from step 16)
+		</li>
+		<li>
+			Once you receive the 'Setup Complete' screen click the OK button
+		</li>
+		<li>
+			You will now see the ColdFusion Administratror screen.  To access this screen at a later date you can go to: <a href="http://127.0.0.1:8500/CFIDE/administrator/index.cfm" target="_new">http://127.0.0.1:8500/CFIDE/administrator/index.cfm</a>
+		</li>
+		<li>
+			You have now successfully installed ColdFusion 10.  To access the web root you can go to: <a href="http://127.0.0.1:8500" target="_new">http://127.0.0.1:8500</a>.  The web root on the file system is C:\ColdFusion10\wwwroot
+		</li>
+	</ol>
+</p>
+
+-----------------------
+
+mysql
+
+<p>
+	ColdFusion has the ability to communicate with a number of different databases, which will be covered later on in this course, but for the sample application we will be using MySQL.  If you already have MySQL 4 or 5 already installed then you can proceed to the next 'Install Sample Files' section.  If not, follow the steps bellow:
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up a browserand go to: <a href="http://dev.mysql.com/downloads/mysql/" target="_new">http://dev.mysql.com/downloads/mysql/</a>
+		</li>
+		<li>
+			Scroll half way down the page to the list of available downloads.  Click the Download button next to the applicable download. If you are on a 64 bit machine select 'Windows (x86, 64-bit), MSI'.  If you are on an 32 bit machine select 'Windows (x86, 32-bit), MSI '.  If you are unsure assume you are on a 32bit machine.
+		</li>
+		<li>
+			To begin the download you must either login using pre existing credentials, click the proceed button under the New Users section or click the 'No thanks, just start my download' link at the bottom of the screen.
+		</li>
+		<li>
+			Save the file to your desktop.
+		</li>
+		<li>
+			Double click the file
+		</li>
+		<li>
+			Click Next
+		</li>
+		<li>
+			Accept the terms in the lisence agreement and click Next
+		</li>
+		<li>
+			Select Typical
+		</li>
+		<li>
+			Click Install
+		</li>
+		<li>
+			If a MySQL enterprise pop up window appears, click next until it disapears
+		</li>
+		<li>
+			Click Finish
+		</li>
+		<li>
+			Click Next
+		</li>
+		<li>
+			Select Standard Configuration and click Next
+		</li>
+		<li>
+			Keep 'Install as a Service' selected as well as 'Launch the MySQL Server automatically' and select Next
+		</li>
+		<li>
+			Specify a new root password and select Next.  Remember this password as it will be needed later!
+		</li>
+		<li>
+			Click Execute
+		</li>
+		<li>
+			Click Finish
+		</li>
+		<li>
+			You have successfully installed MySQL
+		</li>
+	</ol>
+</p>
+
+-------------------------
+Sample Files
+
+
+
+
+
+
+
+
+
+

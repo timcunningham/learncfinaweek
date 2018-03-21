@@ -1,0 +1,612 @@
+What is ColdFusion?
+
+<p>
+	ColdFusion is an Application Server that runs on Tomcat.  Older versions, before CF 10, run on JRun.  Although many developers say they write ColdFusion code, what they are actually writing is CFML, which is ColdFusion Markup Language.  CFML is either written in tag form, similar to HTML, or in script form, similar to JavaScript.  
+</p>
+
+
+
+-----------
+
+Setting Variables 
+
+<p>
+Programming is all about doing stuff to things. Generally, the stuff is the execution of a process or algorithm and the things are information or data.
+</p>
+<p>
+An algorithm is just a fancy name for a series of steps, like tying your shoelaces. Information or data is just values. Your name is a piece of information and so is your birth date. Since it's shorter, in this article we'll use the word data to describe a piece of information.
+</p>
+<p>
+In ColdFusion, data is held in variables. Think of a variable like a mailbox. You can stuff things like letters and packages into a mailbox and get them out later to do stuff. ColdFusion makes storing information very easy because it's a loosely typed Language. You can stick any kind of data into a ColdFusion variable without having to tell ColdFusion what kind of data it is.
+</p>
+<h3>
+Here's the simplest code to set a variable:
+</h3>
+<pre class="prettyprint">
+&lt;cfset ThisIs = "fun" /&gt;
+</pre>
+
+<p>
+Now, any time I refer to <strong>ThisIs</strong> in my ColdFusion code, it'll hold the data "fun". You can look at the contents of a variable in ColdFusion by using the <strong>cfdump</strong> tag.
+</p>
+
+<pre class="prettyprint">
+&lt;cfdump var = "#ThisIs#" /&gt;
+</pre>
+
+<p>
+See how the variable contains the string <strong>"fun"</strong>?
+</p>
+<p>
+<strong>A few things to note.</strong> Examine the statement again:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset ThisIs = "fun" /&gt;
+</pre>
+
+<p>
+The part of the statement to the left of the equals sign (<strong>ThisIs</strong>) is the variable name. The part of the statement to the right of the equals sign (<strong>"fun"</strong>) is the value to assign to the variable.
+</p>
+<p>
+	Now, in the second statement, you’ll note we surrounded the variable name with pound # or hash symbols.  The pound sign tells ColdFusion to evaluate the contents. In the below example, the pound sign will tell ColdFusion to replace the ThisIs string with the contents of the previously defined variable ThisIs.
+</p>
+<pre class="prettyprint">
+&lt;cfdump var = "#ThisIs#" /&gt;
+</pre>
+<p>
+	Here’s another way to look at pound sign use. Examine the below three statements. Can you guess what will happen in each case?
+</p>
+<pre class="prettyprint">
+&lt;cfdump var = "1 + 2" /&gt;&lt;br /&gt;
+&lt;cfdump var = "#1 + 2#" /&gt;&lt;br /&gt;
+&lt;cfdump var = "1 + 2 IS #1 + 2#" /&gt;&lt;br /&gt;
+</pre>
+<p>
+	In the first statement, our math problem is surrounded by the Double Quote character. This tells ColdFusion to treat the statement as a string and do no evaluations on it.
+</p>
+<p>
+	In the second statement, we also surrounded the math problem with the pound sign. ColdFusion executes the statement and performs our calculation for us.
+</p>
+<p>
+In the third statement, notice we’ve mixed strings and evaluations through the correct use of the pound sign and the double quotes.
+</p>
+
+<h2>
+The Left Side Of The Statement: &lt;cfset ThisIs
+</h2>
+<p>
+The left side of the statement is the variable name. You can have numbers as part of the variable name, but the variable name must start with a letter. You must not have any spaces in your variable names. If you need to use more words for your variable name, you can simply write the variable with <strong>CamelCase</strong> letters, or use Under_Scores to separate each word if you want. The choice is one of style; there are no right answers. Also, most special characters are not allowed in variable names. A good rule to follow is variable names should be descriptive and help provide context to what is being done.
+</p>
+<p>
+For example, the word <strong>variable</strong> is a bad naming choice because the name adds no context to why the variable exists:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset variable = "12/26/1975" /&gt;
+</pre>
+<p>
+The variable name <strong>UserBirthdate</strong> is a good naming choice because it adds context to why the variable exists:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset UserBirthdate = "12/26/1975" /&gt;
+</pre>
+<blockquote>
+<strong>Pro Tip:</strong> You'll understand the most about WHY your program is written a certain way as you are writing it. Take advantage of that hard-earned understanding and leave yourself (or others) as many clues and as much context as possible. Later on, after you've forgotten some of the details, it'll be much easier to piece together why the program was written a certain way and it'll be quicker to make good updates to your program.
+</blockquote>
+<h2>
+	The Right Side Of The Statement: "fun" /&gt;
+</h2>
+
+<p>
+The right side of the statement contains the value for the variable. Simple strings are enclosed in single or double quotes, with double quotes being the most common.
+</p>
+<p>
+The right side of the statement is an execution zone. This means ColdFusion will attempt to evaluate items on the right side of the statement.
+</p>
+<h2>
+	Examples
+</h2>
+<p>
+	Here are a few examples that will help you understand setting ColdFusion variables:
+</p>
+<h3>
+Print Out the Current Date:
+</h3>
+<pre class="prettyprint">
+&lt;cfset DateToday = now() /&gt;
+&lt;cfdump var = "#DateToday#" /&gt;
+</pre>
+<p>
+Put the above lines of code into your application, save it, and run the page.
+</p>
+<p>
+See how the ColdFusion function now(), which gets the servers current date and time, was evaluated and the contents placed in the variable DateToday? Anything not specifically in quotes (double or single) will be evaluated. It is possible to evaluate items in quotes, if you use the # sign. Keep this in mind as you develop ColdFusion. Novices have a tendency to overuse the pound sign.
+</p>
+<h3>
+Alternate Method: Print Out the Current Date:
+</h3>
+<p>
+This code will evaluate to the same thing in the previous step.
+</p>
+
+<pre class="prettyprint">
+&lt;cfset DateToday = "#now()#" /&gt;
+&lt;cfdump var = "#DateToday#" /&gt; 
+</pre>
+<p>
+However, unless there are strings in the quotes, it's generally preferred to use the previous method.
+</p>
+<p>
+	To mix execution and strings, do this:
+</p>
+<h3>
+	Mix Execution and Strings
+</h3>
+<pre class="prettyprint">
+&lt;cfset DateToday = "Today is: #now()#" /&gt;
+&lt;cfdump var = "#DateToday#" /&gt; 
+</pre>
+<h3>
+Concatenation
+</h3>
+
+<p>
+You could also concatenate the strings using the & operator. This example is functionally equal to the previous example:
+</p>
+<pre class="prettyprint">
+&lt;cfset DateToday = "Today is: " & now() /&gt;
+&lt;cfdump var = "#DateToday#" /&gt; 
+</pre>
+<p>
+<strong>So is this one:</strong>
+</p>
+<pre class="prettyprint">
+&lt;cfset DateToday = "Today is: " /&gt;
+&lt;cfset DateToday = DateToday & now() /&gt;
+&lt;cfdump var = "#DateToday#" /&gt; 
+</pre>
+<p>
+See how we added DateToday to another evaluation and replaced the DateToday variable name with the new contents?
+</p>
+<h2>
+	Outputting a Variable
+</h2>
+
+<p>
+You will often need to output the contents of the variables you create. One reason is to display the contents of a variable to the user, perhaps to display the username on a web page. Another reason is to verify the contents of a variable while you are in the process of writing or debugging your program.
+</p>
+<h4>
+	About cfoutput 
+</h4>
+
+<p>
+To display the contents of a variable to a user, use cfoutput. The variable reference must be a simple value that can be displayed as text. This includes Strings, Numbers, Dates, Times, and so on. Complex variables, such as Structs, Arrays, Queries, Functions, and so on, can not be displayed with the cfoutput command because they are not displayable as text.
+</p>
+<h4>
+Example of cfoutput Usage
+</h4>
+<pre class="prettyprint">
+&lt;cfset DateToday = "Today is: #now()#" /&gt;
+	
+&lt;cfoutput&gt;#DateToday#&lt;/cfoutput&gt;
+</pre>
+<p>
+The variable will be evaluated, and the variable contents will be added to the current end of the response buffer. i.e. it will be displayed to the user.
+</p>
+<h4>
+	About cfdump
+</h4>
+
+<p>
+To inspect or verify the contents of a variable while writing or debugging your program, use cfdump. ColdFusion makes it very easy to see the contents of ANY variable by using the cfdump command. cfdump will convert the variable contents to a string representation and format it for easy viewing. The cfdump command can be used to help debug your program.
+</p>
+<h4>
+Example of cfdump Usage
+</h4>
+<pre class="prettyprint">
+&lt;cfset DateToday = "Today is: #now()#" /&gt;
+	
+&lt;cfdump var = "#DateToday#" /&gt;
+	
+&lt;cfset DateArray = [dateFormat(now(), "short"), dateFormat(dateadd('d',1,now()), "short"), dateFormat(dateadd('d',2,now()), "short")] /&gt;
+	
+&lt;cfdump var = "#DateArray#" /&gt;
+	
+&lt;cfset DateStruct = { today=dateFormat(now(), "short"), tomorrow=dateFormat(dateadd('d',1,now()), "short"), later=dateFormat(dateadd('d',2,now()), "short") } /&gt;
+	
+&lt;cfdump var = "#DateStruct#" /&gt;
+</pre>
+------------
+
+<h1>Data Types</h1>
+
+<p>
+In our last Chapter, we talked about variables, data, and how to transport data around in your application. Different data types serve different purposes.
+</p>
+<h2>
+	Strings/Numbers
+</h2>
+<p>
+	
+<strong>Is Simple:</strong> Yes
+</p>
+<p>
+Strings and numbers are very easy to work with. To set a string or a number, use the cfset command. To append strings and numbers to each other, use the & operator:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset aString = "hi" /&gt;
+&lt;cfset aNumber = 42 /&gt;
+&lt;cfset aStringAndANumber = aString & aNumber /&gt;	
+
+aString: &lt;cfoutput&gt;#aString#&lt;/cfoutput&gt;
+aNumber: &lt;cfoutput&gt;#aNumber#&lt;/cfoutput&gt;
+aStringAndANumber: &lt;cfoutput&gt;#aStringAndANumber#&lt;/cfoutput&gt;
+</pre>
+<p>
+If you have a big block of strings to set, you can use the cfsavecontent command.
+</p>
+<pre class="prettyprint">
+&lt;cfsavecontent variable="EmailContent"&gt;
+    Hi 
+
+    We want to send you a hoverboard.
+    Let us know if you will accept this free offer.
+
+    -Us
+&lt;/cfsavecontent&gt;
+
+&lt;cfoutput&gt;#EmailContent#&lt;/cfoutput&gt;
+</pre>
+<h2>
+	Dates
+</h2>
+	
+<p>
+<strong>Is Simple:</strong> Kind of
+</p>
+<p>
+Dates are also very easy to work with in ColdFusion. You can use built in functions like now() to make a date, or you can type the date into the variable assignment like this:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset DateToday = now() /&gt;
+&lt;cfset NewYearDay = "1/1/2013" /&gt;
+</pre>
+<p>
+You can use built-in functions to work with dates. To show how many days it has been since the turn of the century:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset DaysSinceTurnOfCentury = DateDiff("d", "1/1/2000", now() ) /&gt;
+&lt;cfoutput&gt;#DaysSinceTurnOfCentury#&lt;/cfoutput&gt;
+</pre>
+<p>
+Or suppose you want to know what the date will be 42 days from now:
+</p>
+
+<pre class="prettyprint">
+&lt;cfset FortyTwoDaysFromNow = DateAdd("d", now(), 42 ) /&gt;
+</pre>
+<p>
+ColdFusion provides many useful functions to work with dates and times. You can compare dates, find out how far two dates are apart, reformat a date, and more. See the ColdFusion Date/Time documentation for a full listing: <a href="http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-6986" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-6986</a>
+</p>
+<h2>
+	Arrays
+</h2>
+	
+<p>
+<strong>Is Simple:</strong> No
+</p>
+<p>
+Arrays are an ordered series of data. Here's an example of a one dimensional array:
+</p>
+<h3>
+Array Creation
+</h3>
+<pre class="prettyprint">
+&lt;cfset ThingsILike = ["Warm Sandy Beaches", "Tropical Drinks", 42] /&gt;
+&lt;cfdump var = "#ThingsILike#" /&gt;
+</pre>
+<h3>
+	Alternate Method: Array Creation
+</h3>
+
+<p>
+Here's another way to create an array, along with a couple of different ways to add data to an array:
+</p>
+<pre class="prettyprint">
+&lt;cfset ThingsILike = arrayNew(1) /&gt;
+</pre>
+<h3>
+	Adding items to an Array
+</h3>
+	
+<p>
+You can add things by a specific position. Note: Arrays in ColdFusion start at 1, not 0.
+</p>
+<pre class="prettyprint">
+&lt;cfset ThingsILike[1]  = "Warm Sandy Beaches" /&gt;
+</pre>
+<h3>
+	Alternate Method: Adding items to an Array
+</h3>	
+
+<p>
+You can append an item to the end of the array
+</p>
+<pre class="prettyprint">
+&lt;cfset ArrayAppend( ThingsILike,  "Tropical Drinks") /&gt;
+&lt;cfset ArrayAppend( ThingsILike,  42) /&gt;
+&lt;cfdump var="#ThingsILike#" /&gt;
+</pre>
+<p>
+See how I defined the strings in my array with quotes, and non-strings without? Each element in the array is an execution zone also, so if you need ColdFusion to evaluate something, just add it in:
+</p>
+<pre class="prettyprint">
+&lt;cfset ImportantDates = ["12/26/1975", now() ] /&gt;
+&lt;cfdump var = "#ImportantDates#" /&gt;
+</pre>
+<h3>
+	Displaying the Contents of an Array
+</h3>
+
+<p>
+You can not use the cfoutput command on an array because complex data types such as arrays are not displayable as a string. You can loop over the array, however, and output the strings to the page:
+</p>
+<pre class="prettyprint">
+&lt;cfset ThingsILike = ["Warm Sandy Beaches", "Tropical Drinks", 42] /&gt;
+&lt;cfloop array="#ThingsILike#" index="thing"&gt;
+    &lt;cfoutput&gt;#thing#&lt;/cfoutput&gt;
+&lt;/cfloop>
+</pre>
+<p>
+ColdFusion provides many useful functions to work with arrays. You can search the contents of an array for a value, perform mathematical functions such Sum or Average, sort the contents of an array, and more. See the ColdFusion Array function documentation for a full listing: <a href="http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-6a66" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-6a66</a>
+</p>
+
+<h2>
+	Structs
+</h2>
+	
+<p>
+<strong>Is Simple:</strong> No
+</p>
+<p>
+Structs, aka Structures, are a collection of data, stored by a key, or name. Suppose for example, you wanted to store several kinds of fruit and also whether you like it or not. Structs provide a way to organize like name/value pairs and let you refer to them as a single collection.
+</p>
+<h3>
+	Struct Creation
+</h3>
+<pre class="prettyprint">
+&lt;cfset FruitBasket = structNew() /&gt;
+</pre>
+<h3>
+	Alternate Method: Struct Creation
+</h3>
+<pre class="prettyprint">
+&lt;cfset FruitBasket = {} /&gt;
+</pre>
+<h3>
+	Adding items to a Struct: Bracket Notation
+</h3>
+<pre class="prettyprint">
+&lt;cfset FruitBasket = {} /&gt;
+&lt;cfset FruitBasket["Apple"] = "Like" /&gt;
+&lt;cfset FruitBasket["Banana"] = "Like" /&gt;
+&lt;cfset FruitBasket["Cherry"] = "Dislike" /&gt;
+
+&lt;cfdump var = "#FruitBasket#" /&gt;
+</pre>
+<h3>
+	Adding items to a Struct Dot Notation
+</h3>
+<pre class="prettyprint">
+&lt;cfset FruitBasket = {} /&gt;
+&lt;cfset FruitBasket.Apple = "Like" /&gt;
+&lt;cfset FruitBasket.Banana = "Like" /&gt;
+&lt;cfset FruitBasket.Cherry = "Dislike" /&gt;
+
+&lt;cfdump var = "#FruitBasket#" /&gt;
+</pre>
+<h3>
+	Struct Creation and Population in One Statement
+</h3>
+<pre class="prettyprint">
+&lt;cfset fruitBasket = {
+    "Apple" = "Like",
+    "Banana" = "Like",
+    "Cherry" = "Dislike"
+} /&gt;
+&lt;cfdump var = "#FruitBasket#" /&gt;
+</pre>
+
+<blockquote>
+<strong>Pro Tip:</strong> There are reasons to use one struct notation over another. If you ran some of these examples you would notice that the Bracket Notation preserved the case of the keys and the Dot Notation did not. Sometimes the preservation of case is important, like when passing values to Javascript or other case sensitive languages or formats.  In the Struct Creation and Population in One Statement Example, the case will be preserved as long as they keys are surrounded by quotes. If the keys are not quoted, the case will be converted to upper case. <br /><br />Also, the bracket notation allows for a dynamic key reference. This is helpful when the name of the struct key will come from a runtime operation, such as looping over the struct. Many people find Dot Notation easier to read and use it most of the time, except in cases where Bracket Notation offers a feature Dot Notation does not.
+</blockquote>
+<h3>
+	Displaying the Contents of a Struct
+</h3>
+
+<p>
+See how your preference was mapped to the kind of fruit? You can't use the cfoutput command on structs either because, once again, they aren't displayable as a string. You can loop over the struct and output the keys and values to the page:
+</p>
+<pre class="prettyprint">
+&lt;cfloop collection="#FruitBasket#" item="fruit"&gt;
+    &lt;cfoutput&gt;I #FruitBasket[fruit]# #fruit#&lt;/cfoutput&gt;&lt;br /&gt;
+&lt;/cfloop&gt;
+</pre>
+<p>
+ColdFusion provides many functions to work with structs. You can search the contents of struct, make complete and partial copies, retrieve a list of just the keys, and more. See the ColdFusion Struct function documentation for a full listing: <a hef="http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-69b8" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-69b8</a>
+</p>
+
+<h2>
+	Queries
+</h2>
+
+<p>
+<strong>Is Simple:</strong> No
+</p>
+<p>
+Queries are recordsets. Recordsets contain a series of columns with 0 or more rows. You can think of a query like a single page of a spreadsheet with the columns across the top and rows down the side.
+</p>
+<p>
+Most ColdFusion programs interact with databases. Database interaction takes the form of a query and ColdFusion makes it very easy to work with the data returned by the database.  Databases will be covered more in more detail later on in the course.
+</p>
+<pre class="prettyprint">
+&lt;cfquery name="FruitQuery" datasource="fruit"&gt;
+    SELECT Name, Price
+    FROM FruitStore
+    WHERE Price &lt; 7
+&lt;/cfquery&gt;
+
+&lt;cfloop query="FruitQuery"&gt;
+    #FruitQuery.Name# costs #FruitQuery.Price# &lt;br /&gt;
+&lt;/cfloop&gt;
+</pre>
+
+<p>
+Query Objects have a few special properties. You can use these properties to get specific information about the data inside the query.
+</p>
+<p>
+	<ul>
+		<li>Queryname.recordcount - How many rows does this query have?</li>
+		<li>Queryname.columnlist - What columns does this query have?</li>
+		<li>Queryname.currentrow - What row number are we currently on inside a cfoutput or cfloop?</li>
+	</ul>
+	
+</p>
+
+
+
+
+<p>
+ColdFusion provides several useful functions to work with query objects. You can create your own query objects in ColdFusion without a database call or even retrieve all the values in a specific column in a list format. See the ColdFusion Query function documentation for a full listing:  <a href="http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-67fe" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec1a60c-7ffc.html#WSc3ff6d0ea77859461172e0811cbec22c24-67fe</a>
+</p>
+<p>
+Also, be sure to review the Accessing and Using Data portion of the ColdFusion documentation, which explains a number of key concepts and techniques for working with data, databases and query objects: <a href="http://help.adobe.com/en_US/ColdFusion/10.0/Developing/WS8f0cc78011fffa7168855f811cdb0b0cce-8000.html" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/Developing/WS8f0cc78011fffa7168855f811cdb0b0cce-8000.html</a>
+</p>
+------
+
+
+Commenting
+
+<p>
+In our previous sections we talked about the importance of adding context into your programs. You’ll find you will spend much more time reading programs for the purposes of debugging and enhancing, than you spend writing the program. So take care to write your programs in such a way the program can be read and understood as easily as possible. </p>
+<p>
+Context is important because our programs express a problem to a computer using a kind of shorthand, in our case ColdFusion programming code. The computer doesn’t much care about the amount of context in the application, as long as the instructions (code) are all properly formed. The program is good enough for the computer if it works well. But this doesn’t necessarily mean the program is good enough for a human. Programs that are good for humans can be efficiently understood, debugged and enhanced by another programer.
+</p>
+<p>
+One way to add context is to use descriptive variable names.
+</p>
+
+<h3>
+Not Descriptive:
+</h3>
+<pre class="prettyprint">
+&lt;cfset var1 = "42" /&gt;
+</pre>
+<h3>
+Descriptive:
+</h3>
+<pre class="prettyprint">
+&lt;cfset AnswerForEverything = 42 /&gt;
+</pre>
+<p>
+Another way to add context to your program is by writing a descriptive comment. ColdFusion comments resemble HTML comments, only with an extra dash on each end.
+</p>
+<p>
+Any text or programming code inside of a comment is not executed nor displayed. Only a person with access to the source code can see the content inside of a comment.
+</p>
+<pre class="prettyprint">
+HTML Comment
+&lt;!-- I am an HTML Comment--&gt;
+
+ColdFusion Comment
+&lt;!---  I am a ColdFusion Comment---&gt;
+
+&lt;cfscript>
+    // I am a ColdFusion Comment in CFScript for a single line
+    /*
+        I am a multi-line
+        ColdFusion Comment in CFScript
+    */
+&lt;/cfscript&gt;
+</pre>
+
+<h2>
+	Example of Good Comments
+</h2>
+<p>	
+You can use comments to describe your intent and give context to a section of your programming code:
+</p>
+<pre class="prettyprint">
+&lt;!--- Always load the hard coded value if specified ---&gt;
+&lt;cfif len( trim ( ChartHelperName ) )&gt;
+    &lt;cfset ReportPeriod = ChartHelperName /&gt;
+&lt;/cfif&gt;
+
+&lt;!--- Load the Chart Helper as defined in the config ---&gt;
+&lt;cfset ChartHelper = ChartHelperLoader.load( ReportPeriod, filter, ChartHelperOptionList ) /&gt;
+
+&lt;!--- Add the bits to the helper, shove the helper in the event, then announce the right result ---&gt;
+&lt;cfset event.setValue( ChartHelperEventValue, ChartHelper ) /&gt;
+</pre>
+<p>
+Programming code explains the HOW, portion of problem solving. Proper use of comments explain the WHY part of the problem solving. It's much better to make comment notations about your program when you are writing your program because that is when you best understand the problem and how you have chosen to solve it.
+</p>
+
+<p>
+	Later on, after the program has been written, you will be very happy to have good comments in your program explaining the WHY part of your program, so you can make updates and alterations in the same spirit as when you wrote the initial program.
+</p>
+
+
+
+
+
+
+
+
+
+
+--------------
+ColdFusion Tags vs. ColdFusion Script
+
+<p>
+	ColdFusion has been designed to allow the use of ColdFusion tags and ColdFusion script. Functionally, both will be interpreted equally and will achieve the same result. The use of ColdFusion Tags and ColdFusion Script is up to personal or team preference. One or two ColdFusion operations are currently Tag only, as of this tutorial, but these will be made available in ColdFusion script in future releases.
+</p>
+<p>
+Some developers write all ColdFusion code in Tags. Some developers write all ColdFusion code in Script. Some write the view portions of their ColdFusion code in Tags and the business layer portion in Script. As long as you stay consistent, all approaches are valid. The overarching rule should be legibility and consistency.
+</p>
+<p>
+Let's look at some statements and compare the differences:
+</p>
+<h3>
+Setting a variable:
+</h3>
+<pre class="prettyprint">
+&lt;cfset variable = "value" /&gt;
+&lt;cfscript&gt;
+    variable = "value";
+&lt;/cfscript&gt;
+</pre>
+<h3>
+Looping over an array:
+</h3>
+<pre class="prettyprint">
+&lt;cfset FruitArray = ["apple", "banana", "cherry"] /&gt;
+&lt;cfloop from="1" to="#arrayLen( FruitArray)#" index="i"&gt;
+    &lt;cfoutput&gt;#FruitArray[i]#&lt;/cfoutput&gt;
+&lt;/cfloop&gt;
+
+&lt;cfscript&gt;
+    FruitArray = ["apple", "banana", "cherry"];
+    for( i=1; i <= arrayLen(FruitArray); i++){
+        writeOutput(FruitArray[i]);
+    }
+&lt;/cfscript&gt;
+</pre>
+<p>
+Some developers find the ColdFusion Script syntax to resemble other familiar programming languages. ColdFusion is designed to provide a welcoming and productive developer experience. Try both styles to see which you prefer. The ColdFusion documentation has several good pages on ColdFusion script. <a href="http://help.adobe.com/en_US/ColdFusion/10.0/Developing/WSc3ff6d0ea77859461172e0811cbec22c24-7feb.html" target="_new">http://help.adobe.com/en_US/ColdFusion/10.0/Developing/WSc3ff6d0ea77859461172e0811cbec22c24-7feb.html</a>
+</p>

@@ -1,0 +1,4 @@
+	&lt;cfmail from=”from@domain.com” to=”to@domain.com” subject=”An email send with an alternative mail server” server=”localhost”&gt;
+	   Hello,
+	   This is an email send with an alternative mail server!
+	&lt;/cfmail&gt;

@@ -1,0 +1,6 @@
+﻿component{
+	public function test(){
+		
+	}
+	
+}	

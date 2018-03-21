@@ -1,0 +1,128 @@
+<p>
+	In this hands on we are going to add caching to the blog and to the portfolio sections.
+</p>
+<p>
+	<ol>
+		<li>
+			Before we add caching we need to turn on the debugging  information of the page so that we can detect the changes we are about to make.  Login to your ColdFusion administrator.  The ColdFusion Administrator will be located at http://localhost:8500/cfide/administrator/ for pc’s and http://localhost/cfide/administrator/ for macs.
+		</li>
+		<li>
+			Once logged in go to Debugging Output  Settings under Debugging & Logging.
+		</li>
+		<li>
+			Check the Enable Request Debugging Output option and click Submit Changes.
+		</li>
+		<li>
+			Open up the /www/blog.cfm page in your browser.
+		</li>
+		<li>
+			Scroll to the bottom of the page and take note of the additional information being displayed.
+		</li>
+		<li>
+			Open up the /www.blog.cfm file in your code editor.
+		</li>
+		<li>
+			The first thing we need to do is create a &lt;cfcache> tag.  Locate the Blog Posts comment and create a &lt;cfcache> tag on the line below it with the following attributes:
+			<ul>
+				<li>
+					Action = cache
+				</li>
+				<li>
+					Timespan = #createtimespan(0,1,0,0)# 
+				</li>
+			</ul>			
+		</li>
+		<li>
+			Place the closing &lt;/cfcahe> tag after the closing &lt;/cfoutput> tag.
+		</li>
+		<li>
+			Reload the /www/blog.cfm page in your browser.  Take not of the execution time.
+		</li>
+		<li>
+			Refresh the page again and take note of the execution time.  If this were a larger page you would have noticed a decrease in the execution time.
+		</li>
+		<li>
+			One problem we have right now is that even though the output is being cached, we still pull all blog posts at the beginning of the page request.  To rectify this move the &lt;cfset> located on line 1 so that it is inside the &lt;cfcache> tag.
+		</li>
+		<li>
+			If we were to run the page now the output would still be cached as the cache will not expire for an hour.  To clear the cache go you need to call the &lt;cfcache> tag with an action value of flush.  Create a new page in the /www/ folder and call it clearCache.cfm.
+		</li>
+		<li>
+			Create a &lt;cfcache> tag with the following attribute:
+			<ul>
+				<li>
+					Action - flush
+				</li>
+			</ul>
+		</li>
+		<li>
+			In your browser, go to the /www/clearcache.cfm page.  You will not see any output but the cache is now cleared.
+		</li>
+		<li>
+			Go back to the /www/blog.cfm page in your browser and refresh. Take note of the execution time.
+		</li>
+		<li>
+			Refresh the page again and compare the two execution times.  If the page took long enough to run you will see an improvement in the execution times.
+		</li>
+		<li>
+			To make the differences more visible lets slow down the page load.  Right after the opening &lt;cfcache> tag, add the following line of code:
+<pre>
+&lt;cfset sleep(500) />
+</pre>
+		</li>
+		<li>
+			The line of code we just added will have ColdFusion wait for 500 milliseconds before it continues.  Before we test this functionality, go back to the clearcache.cfm file in your browser and reload the page.
+		</li>
+		<li>
+			Now that the cache is cleared, go back to the blog.cfm file in your browser and reload it.  Take note of the execution time.
+		</li>
+		<li>
+			Refresh the blog.cfm page and review the execution time.  You will notice that the execution time is drastically different.  This is because the cached content is being called, rather than processing the block of code.
+		</li>
+		<li>
+			Remove the sleep tag we just entered.
+		</li>
+		<li>
+			Now that we have the &lt;cfcache> tagin place, lets look at some programmatic caching.  Open up the /www.portfolio.cfm file in your code editor.
+		</li>
+		<li>
+			At the top of the page you should have a &lt;cfquery> tag.  Prior to this create the following &lt;cfset> tag:
+<pre>
+&lt;cfset myPortfolio = cacheGet('myPortfolio') />
+</pre>			
+		</li>
+		<li>
+			The cacheGet function pulls the cache from memory that has the identifier of myPortfolio.  Right now there is nothing cached with that identifier.  We need to first check if anything was returned and if not, we need to execute our code and store the result in cache.  After the &lt;cfset> tag create a &lt;cfif> tag which checks if the myPortfolio variable is null.  The code should look similar to this:
+<pre>
+&lt;cfif isNull(myPortfolio)>
+
+&lt;/cfif>	
+</pre>			
+		</li>
+		<li>
+			Move the &lt;cfquery> that was already in the file inside the &lt;cfif> tag.
+		</li>
+		<li>
+			After the query, create a &lt;cfset> tag that calls the cachePut function, passing in the string ‘myPortfolio’ as well as the query object called myPortfolio.  The resulting code block should look similar to this:
+<pre>
+&lt;cfset myPortfolio = cacheGet('myPortfolio') />
+&lt;cfif isNull(myPortfolio)>
+	&lt;cfquery name="myPortfolio">
+		SELECT
+			id,
+			title,
+			summary,
+			website,
+			image
+		FROM
+			portfolio
+	&lt;/cfquery>	
+	<&lt;fset cachePut('myPortfolio',myportFolio) />
+&lt;/cfif>
+</pre>			
+		</li>
+		<li>
+			The myPortfolio query will now get cached if it is not already in cache.  Run the page a few times and compare the execution times.  If you want to clear the cahce reload the /www/clearCache.cfm page.
+		</li>
+	</ol>
+</p>

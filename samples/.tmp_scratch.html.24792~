@@ -1,0 +1,22 @@
+&lt;cfoutput query="myQuery"&gt;
+    #myquery.CurrentRow# - #myquery.email# - #myquery.firstname# - #myquery.lastname#&lt;br /&gt;
+&lt;/cfoutput&gt;
+
+&lt;cfquery result="qryResult" datasource="cfartgallery"&gt;
+    insert into ART
+    (
+        ARTISTID, ARTNAME, DESCRIPTION, ISSOLD, LARGEIMAGE, MEDIAID, PRICE
+    )
+    values
+    (
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="Test Item" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="Test Desc" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="img.png" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;,
+        &lt;cfqueryparam cfsqltype="CF_SQL_INTEGER" value="1" /&gt;
+    )  
+&lt;/cfquery&gt;
+
+&lt;cfdump var="#qryResult#" /&gt;

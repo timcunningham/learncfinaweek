@@ -1,0 +1,420 @@
+<p>
+	In this hands on we will do a simple database call and output the data.
+</p>
+<p>
+	<ol>
+		<li>
+			Open up the /www/resume.cfm file in your code editor.
+		</li>
+		<li>
+			On line 1 replace the &lt;cfset&gt; tag with an open &lt;cfquery&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Name = mySkillSet
+				</li>
+				<li>
+					Datasource = Learncfinaweek
+				</li>
+			</ul>
+		</li>
+		<li>
+			On the next line enter the following SQL code:
+<pre class="prettyprint">
+SELECT
+	name
+FROM
+	skillset
+ORDER BY
+	name DESC
+</pre>
+		</li>
+		<li>
+			On the next line write a closing &lt;/cfquery&gt; tag.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfquery name="mySkillset" datasource="learncfinaweek"&gt;
+	SELECT
+		name
+	FROM
+		skillset
+	ORDER BY
+		name DESC
+&lt;/cfquery&gt;		
+</pre>			
+		</li>
+		<li>
+			Please note that the datasource you are using was created during the initial set up process for you.
+		</li>
+		<li>
+			Locate the opening &lt;cfloop&gt; tag on or around line 120 and replace it’s attributes with:
+			<ul>
+				<li>
+					Query = mySkillset
+				</li>
+			</ul>
+		</li>
+		<li>
+			Inside the &lt;cfloop&gt; tag replace all references to skill with #mySkillset.name#.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfloop query="mySkillset"&gt;
+	&lt;li class="#mySkillset.name#" id="#mySkillset.name#"&gt;#mySkillset.name#&lt;/li&gt;
+&lt;/cfloop&gt;	
+</pre>			
+		</li>
+		<li>
+			Open up your browser and navigate to the /www/resume.cfm page and confirm that the Skills are still displaying.
+		</li>
+	</ol>
+</p>
+
+<p>
+	In this hands on we are going to create a more complex query and output that to the page.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up the /www/resume.cfm file in your code editor.
+		</li>
+		<li>
+			Below the mySkillset query create another open &lt;cfquery&gt; tag with the following attributes:
+			<ul>
+				Name = myResume
+			</ul>
+			<ul>
+				Datasource = learncfinaweek
+			</ul>
+		</li>
+		<li>
+			After the opening &lt;cfquery&gt; tag provide the following SQL text: 
+<pre class="prettyprint">
+SELECT
+    title, 
+    startDate, 
+    endDate, 
+    details, 
+    type
+FROM
+    resume
+ORDER BY
+    type, 
+    endDate, 
+	startDate 
+</pre>
+		</li>
+		<li>
+			After the SQL text, add a close &lt;/cfquery&gt; tag.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfquery name="myResume" datasource="learncfinaweek"&gt;
+	SELECT
+	    title, 
+	    startDate, 
+	    endDate, 
+	    details, 
+	    type
+	FROM
+	    resume
+	ORDER BY
+	    Type DESC, 
+	    endDate, 
+	    startDate
+&lt;/cfquery&gt;	
+</pre>
+		</li>
+		<li>
+			Locate the Chapter 4 – Section 2 comment tag on or around line 90.
+		</li>
+		<li>
+			After the comment add a &lt;cfoutput&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Query = myResume
+				</li>
+				<li>
+					Group = type
+				</li>
+			</ul>
+		</li>
+		<li>
+			Add a closing &lt;/cfoutput&gt; tag after the first &lt;p&gt; tag on or around line 116.
+		</li>
+		<li>
+			Delete the lines of code from right after the closing &lt;/cfoutput&gt; tag to the second &lt;/div&gt; tag on or around line 130. 
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;div class="left"&gt;
+	&lt;!-- Chapter 4 - Section 2 --&gt;
+	&lt;cfoutput query="myResume" group="type"&gt;
+		&lt;h2&gt;Work Experience &lt;span&gt;&nbsp;&lt;/span&gt;&lt;/h2&gt;
+		&lt;h5&gt;Senior Developer - Google Inc &lt;span&gt;2010 to present &lt;/span&gt; &lt;/h5&gt;
+		&lt;p&gt;Lorem ipsum dolor sit amet, habitasse pretium dolor sociis. Nulla et facilisis interdum elit amet erat, consectetuer condimentum eaque, ante maecenas Suspendisse libero diam.&lt;/p&gt;
+	&lt;/cfoutput&gt;
+&lt;/div&gt;
+</pre>
+		</li>
+		<li>
+			Replace the text “Work Experience” with #myResume.type#.
+		</li>
+		<li>
+			After that line place an opening &lt;cfoutput&gt; tag.
+		</li>
+		<li>
+			Note that we are using the group functionality within ColdFusion which allows sub loops to be performed inside of a &lt;cfoutput&lt;.  This is the only time that a &lt;cfoutput&gt; tag should be nested inside of another &lt;cfoutput&gt; tag.
+		</li>
+		<li>
+			Place a closing &lt;/cfoutput&gt; tag just before the other &lt;/cfoutput&gt; closing tag. 
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;div class="left"&gt;
+	&lt;!-- Chapter 4 - Section 2 --&gt;
+	&lt;cfoutput query="myResume" group="type"&gt;
+		&lt;h2&gt;#type# &lt;span&gt;&nbsp;&lt;/span&gt;&lt;/h2&gt;
+		&lt;cfoutput&gt;
+			&lt;h5&gt;Senior Developer - Google Inc &lt;span&gt;2010 to present &lt;/span&gt; &lt;/h5&gt;
+			&lt;p&gt;Lorem ipsum dolor sit amet, habitasse pretium dolor sociis. Nulla et facilisis interdum elit amet erat, consectetuer condimentum eaque, ante maecenas Suspendisse libero diam.&lt;/p&gt;
+		&lt;/cfoutput&gt;
+	&lt;/cfoutput&gt;
+&lt;/div&gt;
+</pre>			
+		</li>
+		<li>
+			Replace the “Senior Developer –Google Inc” text with #myResume.title#.
+		</li>
+		<li>
+			Replace the “2010 to present” text with #myResume.startDate# to #myResume.endDate#.
+		</li>
+		<li>
+			Replace the contents of the &lt;p&gt; tag with #myResume.details#.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;div class="left"&gt;
+	&lt;!-- Chapter 4 - Section 2 --&gt;
+	&lt;cfoutput query="myResume" group="type"&gt;
+		&lt;h2&gt;#type# &lt;span&gt;&nbsp;&lt;/span&gt;&lt;/h2&gt;
+		&lt;cfoutput&gt;
+			&lt;h5&gt;#myResume.title# &lt;span&gt;#myResume.startDate# to #myResume.endDate# &lt;/span&gt; &lt;/h5&gt;
+			&lt;p&gt;#myResume.details#&lt;/p&gt;
+		&lt;/cfoutput&gt;
+	&lt;/cfoutput&gt;
+&lt;/div&gt;
+</pre>			
+		</li>
+		<li>
+			Open up a browser and navigate to the /www/resume.cfm page.
+		</li>
+		<li>
+			Note that there are new Work Experience and Education information displaying.  Also note that the dates are not displaying in a nicely readable format.
+		</li>
+		<li>
+			Go to the myResume.startDate output on or around line 116 and change it to read: 
+<pre class="prettyprint">
+#dateFormat(myResume.startDate,”mm/dd/yyyy”)#
+</pre>	
+		</li>
+		<li>
+			Reload the /www/resume.cfm page in the browser and note that the start dates are now in a nicely readable format.
+		</li>
+		<li>
+			Go to the myResume.endDate output on or around line 116 and make the same update.  The code should read: 
+<pre class="prettyprint">
+#dateFormat(myResume.endDate,"mm/dd/yyyy")#
+</pre>	
+		</li>
+		<li>
+			Reload the /www/resume.cfm page in the browser.  Notice that the date range does not show an end date for the Senior Developer position?  This is because there is no end date in the database.  Let’s make that a bit more readable.
+		</li>
+		<li>
+			Go back to the reference to myResume.endDate on or around line 116.
+		</li>
+		<li>
+			After the word “to” and before the start of the dateformat function add the following code:
+<pre class="prettyprint">
+&lt;cfif len(myResume.endDate)&gt;
+</pre>			
+		</li>
+		<li>
+			After the end of the dateFormat function add the following code:
+<pre class="prettyprint">
+&lt;cfelse&gt;present&lt;/cfif&gt;	
+</pre>			
+		</li>
+		<li>
+			Your code should look similar to the following:
+<pre class="prettyprint">
+&lt;div class="left"&gt;
+	&lt;!-- Chapter 4 - Section 2 --&gt;
+	&lt;cfoutput query="myResume" group="type"&gt;
+		&lt;h2&gt;#type# &lt;span&gt;&nbsp;&lt;/span&gt;&lt;/h2&gt;
+		&lt;cfoutput&gt;
+			&lt;h5&gt;#myResume.title# &lt;span&gt;#dateFormat(myResume.startDate,"mm/dd/yyyy")# to &lt;cfif len(myResume.endDate)&gt;#dateFormat(myResume.endDate,"mm/dd/yyyy")#&lt;cfelse&gt;present&lt;/cfif&gt; &lt;/span&gt; &lt;/h5&gt;
+			&lt;p&gt;#myResume.details#&lt;/p&gt;
+		&lt;/cfoutput&gt;
+	&lt;/cfoutput&gt;
+&lt;/div&gt;
+</pre>			
+		</li>
+		<li>
+			Reload the /www/resume.cfm page in your browser.
+		</li>
+		<li>
+			You should now see that the Senior Developer entry has a more readable output.
+		</li>
+	</ol>
+</p>
+
+<h2>
+	Homework
+</h2>
+<p>
+	Update the Blog and Portfolio sections to pull the data from the database.
+</p>
+
+<p>
+	In this hands on we are going to generate an xml sitemap that is formatted for use with Google Sitemaps.
+</p>
+<p>
+	<ol>
+		<li>
+			Create a new file in the root of your site called generateSitemap.cfm.
+		</li>
+		<li>
+			On line 1 create an open &lt;cfxml&gt; tag and provide the following attribute:
+			<ul>
+				<li>
+					Variable = xmlSiteMap
+				</li>
+			</ul>
+		</li>
+		<li>
+			After the opening &lt;cfxml&gt; tag enter the following code:
+<pre class="prettyprint">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns="http://www.google.com/schemas/sitemap/0.90"&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/about.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/resume.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/portfolio.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/contact.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/blog.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+&lt;/urlset&gt;	
+</pre>			
+		</li>
+		<li>
+			After this code enter a closing &lt;/cfxml&gt; tag.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfxml variable="xmlSitemap"&gt;
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns="http://www.google.com/schemas/sitemap/0.90"&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/about.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/resume.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/portfolio.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/contact.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;http://www.myWebsite.com/blog.cfm&lt;/loc&gt;
+    &lt;priority&gt;0.5&lt;/priority&gt;
+  &lt;/url&gt;
+&lt;/urlset&gt;	  
+&lt;/cfxml&gt;	
+</pre>			
+		</li>
+		<li>
+			After the closing &lt;/cfxml&gt; tag create an open &lt;cfoutput&gt; tag.
+		</li>
+		<li>
+			On the line after the &lt;cfoutput&gt; tag write #toString(xmlSiteMap)#.
+		</li>
+		<li>
+			After the toString line of code write a closing &lt;/cfoutput&gt; tag.
+		</li>
+		<li>
+			Open up a browser and navigate to /www/generateSiteMap.cfm
+		</li>
+		<li>
+			View source of the page and you will see the generated XML. 
+		</li>
+		<li>
+			Return to your code editor and remove the &lt;cfoutput&gt; tags and their contents.
+		</li>
+		<li>
+			After the closing &lt;/cfxml&gt; tag create a &lt;cffile&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Action = write
+				</li>
+				<li>
+					File = #expandPath(‘./sitemap.xml’)#
+				</li>
+				<li>
+					Output = #toString(xmlSiteMap)#
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cffile action="write" file="#expandpath('./sitemap.xml')#" output="#toString(xmlSitemap)#" /&gt;	
+</pre>			
+		</li>
+		<li>
+			After the &lt;cffile&gt; tag create a &lt;p&gt; tag and provide the text “File created!” and place a closing &lt;/p&gt; tag after the line of text.
+		</li>
+		<li>
+			In your browser reload the /www/generateSiteMap.cfm page and confirm that you see the message “File Created!”
+		</li>
+		<li>
+			Navigate to /www/sitemap.xml and confirm that the xml file was created and that all your xml nodes are displayed.
+		</li>
+	</ol>
+</p>
+

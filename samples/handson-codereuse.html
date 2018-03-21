@@ -1,0 +1,441 @@
+<p>
+	In this hands on we are going to create a function that will take a string and output a string of ASCII charatcers.  Some people think that this will stop email addresses from being spidered.  This may or may not be the case but the logic for creating a function is still the same.
+</p>
+<p>
+	<ol>
+		<li>
+			Open up the /www/about.cfm file in your code editor.
+		</li>
+		<li>
+			Bellow the closing &lt;/cfscript&gt; tag create a &lt;cffunction&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Name = convertStringToASCII
+				</li>
+				<li>
+					Output = false
+				</li>
+				<li>
+					Returntype = String
+				</li>
+				<li>
+					Hint = Converts String to ASCII String
+				</li>
+			</ul>
+		</li>
+		<li>
+			Directly after the open &lt;cffunction&gt; tag create a &lt;cfargument&gt; tag with the following attributes:
+			<ul>
+				<li>
+					name = StringToBeConverted
+				</li>
+				<li>
+					Type = String
+				</li>
+				<li>
+					Required = True
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cffunction name="convertStringToASCII" output="false" returntype="String" hint="Converts string to asccii string" &gt;
+	&lt;cfargument name="stringToBeConverted" type="string" required="true" /&gt;
+&lt;/cffunction&gt;	
+</pre>			
+		</li>
+		<li>
+			After the &lt;cfargument&gt; tage create a &lt;cfset&gt; that sets an empty string to a variable called convertedString.
+		</li>
+		<li>
+			Before the variable name in the &lt;cfset&gt; tag enter the word Var.  This will scope the variable to the local scope that is local to the function and will not interfere with any other variables on the page.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfset var convertedString = '' /&gt;	
+</pre>			
+		</li>
+		<li>
+			After the &lt;cfset&gt; tag create a &lt;cfloop&gt; tag with the following attributes:
+			<ul>
+				<li>
+					From = 1
+				</li>
+				<li>
+					To = #len(arguments.stringToBeConverted)#
+				</li>
+				<li>
+					Index = i
+				</li>
+			</ul>
+		</li>
+		<li>
+			After the opening &lt;cfloop&gt; tag create a &lt;cfset&gt;.  This &lt;cfset&gt; tag will use string concatenation and should look similar to this:
+<pre class="prettyprint">
+&lt;cfset convertedString &= '&##' & asc(mid(arguments.StringTobeConverted,i,1)) & ';' /&gt;
+</pre>
+		</li>
+		<li>
+			After the &lt;cfset&gt; tag create a closing &lt;/cfloop&gt; tag.
+		</li>
+		<li>
+			Bellow the closing &lt;/cfloop&gt; tag create a &lt;cfreturn&gt; tag that returns the convertedString variable.
+		</li>
+		<li>
+			Bellow the &lt;cfreturn&gt; tag create a closing &lt;/cffunction&gt; tag.
+		</li>
+		<li>
+			Your function should look similar to this:
+<pre class="prettyprint">
+&lt;cffunction name="convertStringToASCII" output="false" returntype="String" hint="Converts string to asccii string" &gt;
+	&lt;cfargument name="stringToBeConverted" type="string" required="true" /&gt;
+	&lt;cfset var convertedString = '' /&gt;
+	
+	&lt;cfloop from="1" to="#len(arguments.StringToBeConverted)#" index="i"&gt;
+		&lt;cfset convertedString &= '&##' & asc(mid(arguments.StringTobeConverted,i,1)) & ';' /&gt;
+	&lt;/cfloop&gt;	
+	
+	&lt;cfreturn convertedString /&gt;
+&lt;/cffunction&gt;	
+</pre>			
+			
+		</li>
+		<li>
+			Locate the personalInfo.email output which should be on or around line 130.
+		</li>
+		<li>
+			Wrap the personalInfo.email output with a call to the convertStringToASCII function call.  Your code should look similar to this:
+<pre class="prettyprint">
+#convertStringToASCII(personalInfo.email)#	
+</pre>			
+		</li>
+		<li>
+			Browse to the /www/about.cfm page in your browser.
+		</li>
+		<li>
+			You should see no change to your page.
+		</li>
+		<li>
+			View the source of the page and locate where the email address is being output.  You should no longer see the email address but a stream of ASCII characters.
+		</li>
+	</ol>
+</p>
+
+<p>
+	In this hands on we are going to separate out our header and footer and put the code into separate files that will be included.
+</p>
+<p>
+	<ol>
+		<li>
+			Create a folder called Includes in the root of the www folder.
+		</li>
+		<li>
+			Create a new file in /www/includes/ called header.cfm.
+		</li>
+		<li>
+			Create a new file in /www/includes/ called footer.cfm.
+		</li>
+		<li>
+			Open up the /www/about.cfm file in your code editor.
+		</li>
+		<li>
+			Copy all lines from &lt;!DOCTYPE down to and including the &lt;!--header end --&gt; line.
+		</li>
+		<li>
+			Paste these lines of code into the header.cfm file.
+		</li>
+		<li>
+			Delete these lines from /www/about.cfm.
+		</li>
+		<li>
+			Copy all lines from bellow the &lt;!--about end --&gt; comment.
+		</li>
+		<li>
+			Paste these lines of code into footer.cfm.
+		</li>
+		<li>
+			Delete these lines from /www/about.cfm.
+		</li>
+		<li>
+			In a browser navigate to the /www/about.cfm page. Notice that it no longer looks correct.
+		</li>
+		<li>
+			Go back to the /www/about.cfm file in your code editor.
+		</li>
+		<li>
+			At the top of the file, just bellow your &lt;cffunction&gt; tag block on or around line 14 and create a new tag called &lt;cfinclude&gt; with the following attribute:
+			<ul>
+				<li>
+					Template = includes/header.cfm
+				</li>
+			</ul>
+		</li>
+		<li>
+			Go to the bottom of the file and create a &lt;cfinclude&gt; tag with the following attribute:
+			<ul>
+				<li>
+					Template = includes/footer.cfm
+				</li>
+			</ul>
+		</li>
+		<li>
+			Go back to your browser and refresh the about.cfm file.  You should now see the page as it used to be.
+		</li>
+		<li>
+			Open up the /www/includes/header.cfm file in your code editor.
+		</li>
+		<li>
+			At the top of the page create a &lt;cfparam&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Name = Section
+				</li>
+				<li>
+					Default = Home
+				</li>
+			</ul>
+		</li>
+		<li>
+			Locate the link to the homepage in the navigation which should be on or around line 61.
+		</li>
+		<li>
+			Inside the &lt;li&gt; tag add the following line of code:
+<pre class="prettyprint">
+&lt;cfif section eq "home"&gt;id="selected"&lt;/cfif&gt;
+</pre>			
+		</li>
+		<li>
+			Do the same for the other links in the navigation but instead of checking if section eq “Home” replace home with the value of the &lt;li&gt; class.
+		</li>
+		<li>
+			Once completed your code should look similar to this:
+<pre class="prettyprint">
+&lt;ul class="arrowunderline" id="nav"&gt;
+	&lt;li class="home" &lt;cfif section eq "home"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="index.cfm"&gt;Home&lt;/a&gt;&lt;/li&gt;
+	&lt;li class="about" &lt;cfif section eq "about"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="about.cfm"&gt;About&lt;/a&gt;&lt;/li&gt;
+	&lt;li class="resume" &lt;cfif section eq "resume"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="resume.cfm"&gt;Resume&lt;/a&gt;&lt;/li&gt;
+	&lt;li class="blog" &lt;cfif section eq "blog"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="blog.cfm"&gt;Blog&lt;/a&gt;&lt;/li&gt;
+	&lt;li class="portfolio" &lt;cfif section eq "portfolio"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="portfolio.cfm"&gt;Portfolio&lt;/a&gt;&lt;/li&gt;
+	&lt;li class="contact" &lt;cfif section eq "contact"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="contact.cfm"&gt;Contact&lt;/a&gt;&lt;/li&gt;	
+&lt;/ul&gt;
+</pre>			
+		</li>
+		<li>
+			In your browser refresh the /www/about.cfm page.  You will notice that the navigation is currently highlighting the home navigation item rather than the about navigation item.  This is because we have not set the Section variable on the about.cfm page.
+		</li>
+		<li>
+			Open up the /www/about.cfm in your code editor and locate the &lt;cfinclude&gt; tag which includes the header.  This should be on or around line 5.
+		</li>
+		<li>
+			Before the &lt;cfinclude&gt; tag create a &lt;cfset&gt; tag and set the value of “About” to a variable called Section.  Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfset section = "About" /&gt;
+</pre>			
+		</li>
+		<li>
+			In your browser, refresh the /www/about.cfm page and notice that the About navigation item is now highlighted.
+		</li>
+	</ol>
+</p>
+<h2>
+	Home Work
+</h2>
+<p>
+	Update all other pages in the site so that they use the included header and footer rather than the inline code.
+</p>
+
+<p>
+	In this hands on we will create a custom tag that will handle the display of our header and footer
+</p>
+
+<p>
+	<ol>
+		<li>
+			Create a folder called CustomTags in the www root folder.
+		</li>
+		<li>
+			Create a file called page.cfm in the /www/customTags/ folder.
+		</li>
+		<li>
+			Open the /www/customTags/page.cfm file in your code editor.
+		</li>
+		<li>
+			Create a &lt;cfif&gt; tag that checks if thisTag.executionMode is equal to “Start”.
+		</li>
+		<li>
+			Create a &lt;cfelse&gt; tag after the &lt;cfif&gt; tag.
+		</li>
+		<li>
+			Create a closing &lt;/cfif&gt; tag after the &lt;cfelse&gt; tag.
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfif thisTag.executionMode eq "start"&gt;
+	
+&lt;cfelse&gt;
+	
+&lt;/cfif&gt;		
+</pre>			
+		</li>
+		<li>
+			Open up the /www/includes/header.cfm file in your code editor.
+		</li>
+		<li>
+			Copy the contents of header.cfm and paste them into the first part of the &lt;cfif&gt; tag block in page.cfm.
+		</li>
+		<li>
+			Open up the /www/includes/footer.cfm file in your code editor.
+		</li>
+		<li>
+			Copy the contents of footer.cfm and paste them into the &lt;cfelse&gt; part of the &lt;cfif&gt; statement in page.cfm.
+		</li>
+		<li>
+			Open up the /www/about.cfm file in your code editor and navigate to the &lt;cfset&gt; tag located on or around line 4.
+		</li>
+		<li>
+			Replace the &lt;cfset&gt; tag with a &lt;cfimport&gt; tag with the following attributes:
+			<ul>
+				<li>
+					Taglib = customTags/
+				</li>
+				<li>
+					Prefix = layout
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfimport path="customTags/" taglib="layout" /&gt;
+</pre>			
+		</li>
+		<li>
+			Replace the &lt;cfinclude&gt; tag which includes the header.cfm file with a call to your custom tag.  The code should look similar to this:
+<pre class="prettyprint">
+&lt;layout:page&gt;	
+</pre>			
+		</li>
+		<li>
+			Replace the &lt;cfinclude&gt; tag which includes the footer.cfm file with a closing tag to your custom tag. Your code should look similar to this:
+<pre class="prettyprint">
+&lt;/layout:page&gt;
+</pre>			 
+		</li>
+		<li>
+			Open up your browser and navigate to the /www/about.cfm page.  Notice that the page loads as it did before.  The page is now using your custom tag rather than the include files. The only exception is that the Home navigation item is being selected rather than the About navigation item.
+		</li>
+		<li>
+			Open up the /www/customtags/page.cfm file in your code editor.
+		</li>
+		<li>
+			Find the &lt;cfparam&gt; tag that should be on or around line 2.
+		</li>
+		<li>
+			Change the name attribute from section to attributes.section.
+		</li>
+		<li>
+			Locate the Navigation &lt;ul&gt; block on or around line 52.  For each reference to section in the &lt;cfif&gt; tags in the &lt;li&gt; tags, update them to read attributes.section rather than section.  Your code should look similar to this:
+<pre class="prettyprint">
+&lt;ul class="arrowunderline" id="nav"&gt;
+  &lt;li class="home" &lt;cfif attributes.section eq "home"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="index.cfm"&gt;Home&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="about" &lt;cfif attributes.section eq "about"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="about.cfm"&gt;About&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="resume" &lt;cfif attributes.section eq "resume"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="resume.cfm"&gt;Resume&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="blog" &lt;cfif attributes.section eq "blog"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="blog.cfm"&gt;Blog&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="portfolio" &lt;cfif attributes.section eq "portfolio"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="portfolio.cfm"&gt;Portfolio&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="contact" &lt;cfif attributes.section eq "contact"&gt;id="selected"&lt;/cfif&gt;&gt;&lt;a href="contact.cfm"&gt;Contact&lt;/a&gt;&lt;/li&gt;	
+&lt;/ul&gt;	
+</pre>			
+		</li>
+		<li>
+			Refresh the about.cfm page in your browser and confirm that nothing has changed.
+		</li>
+		<li>
+			Open up the /www/about.cfm file in your code editor.
+		</li>
+		<li>
+			Locate the &lt;layout:page&gt; tag and add an attribute called section with a value of “about”.  Your code should look similar to this:
+<pre class="prettyprint">
+&lt;layout:page section="about"&gt;	
+</pre>			
+		</li>
+		<li>
+			Refresh the about.cfm page in your browser and confirm that the about navigation item is now highlighted.
+		</li>
+	</ol>
+</p>
+<h2>
+	Homework
+</h2>
+<p>
+	Convert all other pages to use the page custom tag
+</p>
+
+<p>
+	In this hands on we will create a component where we will place the convertStringToASCII function inside of a component and instantiate it.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Create a folder called cfc inside the /www/ folder.
+		</li>
+		<li>
+			Create a file called utilities.cfc inside of the /www/cfc/ folder.
+		</li>
+		<li>
+			Open up the /www/cfc/utilities.cfc file in your code editor.
+		</li>
+		<li>
+			Create an open and closing &lt;cfcomponent&gt; tag.  Your code should look something like this:
+<pre class="prettyprint">
+&lt;cfcomponent&gt;
+
+&lt;/cfcomponent&gt;
+</pre>			
+		</li>
+		<li>
+			Open up the /www/about.cfm file in your code editor.
+		</li>
+		<li>
+			Copy the &lt;cffunction&gt; block of code and paste it between the &lt;cfcomponent&gt; tags in /www/cfc/utilities.cfc.
+		</li>
+		<li>
+			Inside the &lt;cffunction&gt; tag add an attribute called access and set it to “public”
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre class="prettyprint">
+&lt;cfcomponent&gt;
+	&lt;cffunction name="convertStringToASCII" output="false" returntype="String" hint="Converts string to asccii string" access="public"&gt;
+		&lt;cfargument name="stringToBeConverted" type="string" required="true" /&gt;
+		&lt;cfset var convertedString = '' /&gt;
+		
+		&lt;cfloop from="1" to="#len(arguments.StringToBeConverted)#" index="i"&gt;
+			&lt;cfset convertedString &= '&##' & asc(mid(arguments.StringTobeConverted,i,1)) & ';' /&gt;
+		&lt;/cfloop&gt;	
+		
+		&lt;cfreturn convertedString /&gt;
+	&lt;/cffunction&gt;	
+&lt;/cfcomponent&gt;	
+</pre>			
+		</li>
+		<li>
+			In /www/about.cfm replace the &lt;cffunction&gt; tag block with a &lt;cfset&gt; tag.  The &lt;cfset&gt; tag should set a variable called utilities and sould instantiate the utilities component by using the following code:
+<pre class="prettyprint">
+&lt;cfset utilities = CreateObject('Component','cfc.utilities') /&gt; 	
+</pre>			
+		</li>
+		<li>
+			Locate the call to the convertStringToASCII function which should be on or around line 59 and change the function call to utilities.convertStringToASCII.  The line of code should look similar to this: 
+<pre class="prettyprint">
+#utilities.convertStringToASCII(personalInfo.email)#
+</pre>			
+		</li>
+		<li>
+			Go to the /www/about.cfm page in your browser and notice that the email address displays as it did before.  The convertStringToASCII function is now in a cfc that can be instantiated from any page.
+		</li>
+	</ol>
+</p>

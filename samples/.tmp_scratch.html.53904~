@@ -1,0 +1,101 @@
+		UPDATE
+			SlatwallOrder
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+
+		UPDATE
+			SlatwallOrderFulfillment
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+
+
+		UPDATE
+			SlatwallOrderReturn
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallOrderPayment
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallPaymentTransaction
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallPromotionApplied
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallShippingMethodOption
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallStockReceiverItem
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallSubscriptionUsage
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallTaxApplied
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallVendorOrder
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallVendorOrderItem
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+		UPDATE
+			SlatwallVendorSkuStock
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;
+
+
+		UPDATE
+			SlatwallOrderItem
+		SET
+			currencyCode = 'USD'
+		WHERE
+			currencyCode is null;

@@ -1,0 +1,37 @@
+body{
+	margin-top:80px;
+}
+
+code{
+	color:#015787;
+}
+
+.modal{
+	border-radius:0px;
+}
+
+/*
+#authorModal{
+	width: 720px;	
+}
+*/
+.container{
+	/*background-color:#ffffff !important;*/
+}
+.navbar{
+	background-color:#222222 !important;
+}
+.navbar .nav{
+	margin-left:20px;
+}
+
+.navbar-inner{
+	background-color:#222222 !important;
+}
+.navbar .navbar-inner .container{
+	margin: 10px auto;
+	background-color:#222222 !important;
+}
+p{
+	font-size:14px;
+}

@@ -1,0 +1,524 @@
+<p>
+	In this hands on we are going to make a call to twitter to get a list of our latest tweets and output them to the contact page.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up the /www/contact.cfm file in your code editor.
+		</li>
+		<li>
+			The first thing we need to do is to make a &lt;cfhttp> call to get the data from twitter.  To do this create a &lt;cfhttp> tag directly after the &lt;cfscript> block.  Your code should be on or around line 8.  The &lt;cfhttp> tag should have the following attributes:
+			<ul>
+				<li>
+					url = https://api.twitter.com/1/statuses/user_timeline.xml?&count=5&screen_name=[Your Screen Name]
+				</li>
+				<li>
+					method = get
+				</li>
+				<li>
+					result = twitterFeed
+				</li>
+			</ul>		
+			<blockquote>
+				<strong>Note:</strong> If you do not have a twitter screen name you can use the simonfree screen name for now.
+			</blockquote>	
+		</li>
+		<li>
+			The code should look similar to this:
+<pre>
+&lt;cfhttp url="https://api.twitter.com/1/statuses/user_timeline.xml?&count=5&screen_name=simonfree" method="get" result="twitterFeed" /> 
+</pre>			
+		</li>
+		<li>
+			Now that we have the feed data in the twitterFeed variable we need to output it on the page. To do this we will loop over the XML data that we received from twitter. The first thing we will do is create a &lt;cfloop> tag.  Locate the comment that reads ‘Twitter Output’ and create a &lt;cfloop> tag before the first &lt;li> tag.  The &lt;cfloop> tag should have the following properties:
+			<ul>
+				<li>
+					Array = #xmlParse(twitterFeed.fileContent).statuses.status#
+				</li>
+				<li>
+					Index = feedItem
+				</li>
+			</ul>
+		</li>
+		<li>
+			Place the closing &lt;/cfloop> tag after the closing &lt;/li> tag.
+		</li>
+		<li>
+			Inside the &lt;li> tags place the following line of code:
+<pre>
+#dateformat(feedItem.created_at.xmlText,'mm/dd/yyyy')# - #feedItem.text.xmlText#	
+</pre>			
+		</li>
+		<li>
+			Now wrap the entire &lt;cfloop> block in a &lt;cfoutput> tag so that the variables will be displayed to the user.  Your code should look similar to this:
+<pre>
+&lt;ul>
+	&lt;cfoutput>
+		&lt;cfloop array="#xmlParse(twitterFeed.fileContent).statuses.status#" index="feedItem" >
+			&lt;li>
+				#dateformat(feedItem.created_at.xmlText,'mm/dd/yyyy')# - #feedItem.text.xmlText#
+			&lt;/li>
+		&lt;/cfloop>
+	&lt;/cfoutput>
+&lt;/ul>			
+</pre>			
+		</li>
+		<li>
+			Open up the /www/contact.cfm page in your browser and notice that the 5 latest tweets are now displaying under the Latest Tweet heading.
+		</li>
+	</ol>
+</p>
+<p>
+	In this next hands on we are going to add functionality that will allow us to export a blog post in PDF format.  We will also add a water mark to the pdf.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Create a new file in the /www/ folder called ExportToPDF.cfm
+		</li>
+		<li>
+			Open the /www/ExportToPDF.cfm file in your code editor.
+		</li>
+		<li>
+			On the first line of the file create a &lt;cfparam> tag with the following attributes:
+			<ul>
+				<li>
+					Name = url.id
+				</li>
+				<li>
+					Default = 0
+				</li>
+			</ul>		
+		</li>
+		<li>
+			Next we need to load in the blog post so we can get the data we need.  To do this create a &lt;cfset> that does an entityLoad call requesting a blogPost with the id of url.id and sets it into a blogPost variable.  To do this add the following line of code:
+<pre>
+&lt;cfset blogPost = EntityLoad('blogPost',url.id,true) />	
+</pre>			
+		</li>
+		<li>
+			Before we proceed with the PDF generation we need to make sure that the ID that was passed was for a valid blog post.  To do this we are going to check if the blogPost object does not have a null value.  To do this we will create a &lt;cfif> statement and use the isNull function on the blogPost variable. Your code should look similar to this: 
+<pre>
+&lt;cfparam name="url.id" default="0"  />
+&lt;cfset blogPost = EntityLoad('blogPost',url.id,true) />
+
+&lt;cfif !isNull(blogPost)>
+	
+&lt;/cfif>
+</pre>			
+		</li>
+		<li>
+			Inside of the &lt;cfif> block create a &lt;cfdocument> tag with the following attribute:
+			<ul>
+				<li>
+					Format = PDF
+				</li>
+			</ul>	
+		</li>
+		<li>
+			Add a closing &lt;/cfdocument> tag.
+		</li>
+		<li>
+			Inside the &lt;cfdocument> tags add the following code:
+<pre>
+&lt;cfoutput>
+&lt;h1>
+	#blogPost.title#
+&lt;/h1>
+&lt;p>
+	&lt;strong>Date Posted&lt;/strong>: #dateformat(blogPost.datePosted,'mm/dd/yyyy')#
+&lt;/p>
+#blogPost.body#
+&lt;p>		
+&lt;/cfoutput>
+</pre>			
+		</li>
+		<li>
+			Open up the /www/blog.cfm page in your browser, navigate to a blog post, and click on Export To PDF.  You should see a pdf of the blog post.
+		</li>
+		<li>
+			The next thing we want to do is add a header to the PDF which states it came from the website.  To do this go back to the ExportToPDF.cfm file in your code editor and add a &lt;cfdocumentitem> tag inside the &lt;cfdocumenttag> that has the following properties:
+			<ul>
+				<li>
+					Type=header
+				</li>
+			</ul>		
+		</li>
+		<li>
+			Inside the &lt;cfdocumentitem> add the following code:
+<pre>
+&lt;h1 style="text-align:center;">Generated from our website&lt;/h1>
+</pre>			
+		</li>
+		<li>
+			Your &lt;cfdocument> code should looks similar to this:
+<pre>
+&lt;cfdocument format="PDF">
+	&lt;cfdocumentitem type="header">
+		&lt;h1 style="text-align:center;">Generated from our website&lt;/h1>
+	&lt;/cfdocumentitem>	
+	&lt;cfoutput>
+	&lt;h1>
+		#blogPost.title#
+	&lt;/h1>
+	&lt;p>
+		&lt;strong>Date Posted&lt;/strong>: #dateformat(blogPost.datePosted,'mm/dd/yyyy')#
+	&lt;/p>
+	#blogPost.body#
+	&lt;p>		
+	&lt;/cfoutput>	
+&lt;/cfdocument>
+</pre>			
+		</li>
+		<li>
+			Go back to the ExportToPDF.cfm file in your browser and refresh.  You should now see the title displayed in the PDF.
+		</li>
+		<li>
+			The next thing we need to do is to add a watermark to our pdf.  To do this we need to first save the generated PDF to a variable rather than having it automatically output on the page.  To do this update the &lt;cfdocument> tag and add the following property:
+			<ul>
+				<li>
+					Name = myGeneratedPDF
+				</li>
+			</ul>
+		</li>
+		<li>
+			If you were to re run the ExportToPDF.cfm file in yoru browser you would no longer see the PDF as it is now stored in a variable.  The next thing we need to do is to create a &lt;cfpdf> tag that will allow us to add the watermark.  After the closing &lt;/cfdocument> tag create a &lt;cfpdf> tag with the following attributes:
+			<ul>
+				<li>
+					Action = addWatermark
+				</li>
+				<li>
+					Source = myGeneratedPDF
+				</li>
+				<li>
+					Image=assets/images/watermark.jpeg
+				</li>
+				<li>
+					Foreground = yes
+				</li>
+				<li>
+					Overwrite = yes
+				</li>
+			</ul>
+		</li>
+		<li>
+			Once again, if you were to run this file you would still see no output.  We need to manually tell ColdFusion to display the pdf.  This is done with the &lt;cfcontent> tag.  After the &lt;cfpdf> tag create a &lt;cfcontent> tag with the following attributes:
+			<ul>
+				<li>
+					Variable = #toBinary(myGeneratedPDF)#
+				</li>
+				<li>
+					Type = application/pdf
+				</li>
+			</ul>
+		</li>
+		<li>
+			Reload the ExportToPDF.cfm file in your browser and you should now see your pdf with a large W in the middle.  The W is the Watermark.
+		</li>
+	</ol>
+</p>
+
+<p>
+	In this hands on we are going to create an image file upload.  Once the image is uploaded we are going to resize it to fit our specific measurements.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up the /www/admin/content/portfolio/editportfolio.cfm file in your code editor.
+		</li>
+		<li>
+			The first thing we need to do is upload the image onto the server.  Once on the server we can manipulate it however we want.  To do this first find the Image Upload Process comment and create a &lt;cffile> tag with the following properties:
+			<ul>
+				<li>
+					Action = upload
+				</li>
+				<li>
+					Filefield = image
+				</li>
+				<li>
+					Destination = #getTempDirectory()#
+				</li>
+				<li>
+					Nameconflict = makeunique
+				</li>
+			</ul>
+		</li>
+		<li>
+			This tag will upload the file that is in the form field called image, and will place it into a temporary directory on the server and will make the file name unique if the file already exists on the server.  The &lt;cffile> tag should look similar to this:
+<pre>
+&lt;cffile action="upload" filefield="image" destination="#getTempDirectory()#" nameconflict="makeunique" />	
+</pre>			
+		</li>
+		<li>
+			Next, we need to make sure that the file that was uploaded is of a file type that we can process.  To do this create a &lt;cfif> statement that uses the ListFindNoCase function.  The first argument of the function will be a call to the getReadableImageFormats() function, and the second argument will be the serverFileExt variable in the cffile structure.  Your code should look similar to this:
+<pre>
+&lt;cfif listFindNoCase(getReadableImageFormats(),cffile.serverFileExt)>
+	
+&lt;/cfif>		
+</pre>			
+		</li>
+		<li>
+			Inside the &lt;cfif> tag we are going to add the image resize logic.  If the checks in the &lt;cfif> have passed then we know that the image is safe to resize. Inside the &lt;cfif> create a &lt;cfset> tag.  In this set tag we are going to read in the image using the imageRead function and set it to the variable name imageObject.  Your code should look similar to this:
+<pre>
+&lt;cfset imageObject = imageRead(cffile.serverDirectory & '/' & cffile.serverfile) />	
+</pre>			
+		</li>
+		<li>
+			Next we are going to call the imageScaleToFit function and pass it the imageObject and the dimentions to resize the image to.  As the imageScaletoFit function does not return anything we do not need to assign it to a variable.  Add the following line of code below the &lt;cfset> tag:
+<pre>
+&lt;cfset imageScaleToFit(imageObject,'202','131') />	
+</pre>			
+		</li>
+		<li>
+			Once the image has been resized we need to save the image object back to the file system.  When we write the file we will write it to a location in the web root, rather than a temporary directory, so that it can be displayed to the user.  Use the imageWrite function and pass it the imageObject variable and the desired path to where the file should be written.  Your code will look similar to this:
+<pre>
+&lt;cfset imageWrite(imageObject,expandpath('../../../assets/images/#cffile.serverfile#')) />	
+</pre>			
+		</li>
+		<li>
+			Once the file has been written we need to overwrite the form.image value with the image file value so it can be stored in the database.  The Name of the image is stored in the cffile structure under the key of serverfile.  Your &lt;cfset> tag will look similar to this:
+<pre>
+&lt;cfset form.image = cffile.serverfile />	
+</pre>			
+		</li>
+		<li>
+			Your final &lt;cfif> block should look similar to this:
+<pre>
+&lt;cfif listFindNoCase(getReadableImageFormats(),cffile.serverFileExt)>
+	&lt;cfset imageObject = imageRead(cffile.serverDirectory & '/' & cffile.serverfile) />
+	&lt;cfset imageScaleToFit(imageObject,'202','131') />
+	&lt;cfset imageWrite(imageObject,expandpath('../../../assets/images/#cffile.serverfile#')) />
+	&lt;cfset form.image = cffile.serverfile />
+&lt;/cfif>	
+</pre>			
+		</li>
+		<li>
+			Open up the /www/admin/ page in a browser and navigate to the portfolio section.
+		</li>
+		<li>
+			Once in the portfolio section click on New Portfolio.
+		</li>
+		<li>
+			Fill in the form and provide an image to be uploaded. 
+		</li>
+		<li>
+			Click on submit to create the new portfolio item.
+		</li>
+		<li>
+			Open up the /www/portfolio.cfm page in your browser and confirm that the new portfolio item is being displayed along with the resized image.
+		</li>
+	</ol>
+</p>
+
+
+
+Part 2
+
+<p>
+	In this hands on we are going to import and export data into the blog section using excel.
+</p>
+<p>
+	<ol>
+		<li>
+			First we are going to look at the import process.  Open up the /www/admin/content/blog/importBlog.cfm file in your code editor.
+		</li>
+		<li>
+			Before we can import a spreadsheet we must first move it to the server.  Locate the Upload File comment tag.  On the line below create a &lt;cffile> tag with the following attributes:
+			<ul>
+				<li>
+					Action = upload
+				</li>
+				<li>
+					Destination= #getTempDirectory()#
+				</li>
+				<li>
+					fileField = importFile
+				</li>
+				<li>
+					nameconflict = makeunique
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre>
+&lt;cffile action="upload" destination="#getTempDirectory()#" filefield="importFile" nameconflict="makeunique" />
+</pre>			
+		</li>
+		<li>
+			Once the file is on the server we can then parse the file and put it into a query variable.  To do this we use the &lt;cfspreadsheet> tag.  Locate the Read Spreadsheet comment and create a &lt;cfspreadsheet> tag on the line below with the following attributes:
+			<ul>
+				<li>
+					Action = read
+				</li>
+				<li>
+					Src = #cffile.serverDirectory#/#cffile.serverfile#
+				</li>
+				<li>
+					Query = importData
+				</li>
+				<li>
+					headerRow = 1
+				</li>
+				<li>
+					excludeHeaderRow = true
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre>
+&lt;cfspreadsheet action="read" src="#cffile.serverDirectory#/#cffile.serverfile#" query="importData" headerrow="1" excludeheaderrow="true" />	
+</pre>			
+		</li>
+		<li>
+			Once the spreadsheet has been read into a query variable we must loop over the query and create a new blogPost entity for each row.  To do this locate the Import Data comment tag and create a new &lt;cfloop> tage below it with the following attribute:
+			<ul>
+				<li>
+					Query = importData
+				</li>
+			</ul>
+		</li>
+		<li>
+			Inside the &lt;cfloop> tag create a &lt;cfset> tag that loads in a new blogPost entity and saves it in a variable called blogPost.
+		</li>
+		<li>
+			Below the &lt;cfset> create new &lt;cfset> tags that set the title, summary, body and dateposted values.  Note that as the Date Posted column in the spreadsheet has a space in it you must use bracket notation to access the value rather than dot notation.  Your code should look similar to this:
+<pre>
+&lt;cfloop query="importData">
+	&lt;cfset blogPost = EntityNew('blogPost') />
+	&lt;cfset blogPost.title = importData.title />
+	&lt;cfset blogPost.summary = importData.summary />
+	&lt;cfset blogPost.body = importData.body />
+	&lt;cfset blogPost.dateposted = importData['Date Posted'] />
+&lt;/cfloop>	
+</pre>			
+		</li>
+		<li>
+			The next step is to save the entity.  Just before the closing &lt;/cfloop> tag create a &lt;cfset> tag that calls EntitySave on the blogPost entity.
+		</li>
+		<li>
+			After the closing &lt;/cfloop> tag, create another &lt;cfset> tag that Calls ormFlush().  This will commit all changes to the database.  Your final code should look similar to this:
+<pre>
+&lt;!--- Upload File--->
+&lt;cffile action="upload" destination="#getTempDirectory()#" filefield="importFile" nameconflict="makeunique" />
+
+&lt;!--- Read Spreadsheet --->
+&lt;cfspreadsheet action="read" src="#cffile.serverDirectory#/#cffile.serverfile#" query="importData" headerrow="1" excludeheaderrow="true" />
+
+&lt;!--- Import Data --->
+&lt;cfloop query="importData">
+	&lt;cfset blogPost = EntityNew('blogPost') />
+	&lt;cfset blogPost.title = importData.title />
+	&lt;cfset blogPost.summary = importData.summary />
+	&lt;cfset blogPost.body = importData.body />
+	&lt;cfset blogPost.dateposted = importData['Date Posted'] />
+&lt;/cfloop>
+
+&lt;cfset ormFlush() />
+</pre>			
+		</li>
+		<li>
+			Open up the /www/admin/content/blog/importBlog.cfm page in your browser.
+		</li>
+		<li>
+			Select an excel file and click Import.  A template excel file can be found at /www/assets/blogImport.xslx.
+		</li>
+		<li>
+			Go to the /www/admin/content/blog/listblogpost.cfm page in your browser and you will see the imported blog posts.
+		</li>
+		<li>
+			Now that the import process is completed we are going to create an export process.  Create a new file called exportBlog.cfm in the /www/admin/content/blog/ folder.
+		</li>
+		<li>
+			Open up the /www/admin/content/blog/exportBlog.cfm file in your code editor.
+		</li>
+		<li>
+			For this task we are going to write some of it in &lt;cfscript> so create a new &lt;cfscript> block.
+		</li>
+		<li>
+			Inside the &lt;cfscript> create a variable called blogPosts that contains all the blogPost entities.  You can do this by calling EntityLoad(‘blogPost’).
+		</li>
+		<li>
+			On the next line we need to create a new spreadsheet called exportSpreadhseet by calling the SpreadsheetNew function and pass it in a string of ‘Blog Posts’.  This will name our first sheet Blog Posts. Your code should look similar to this:
+<pre>
+&lt;cfscript>
+	blogPosts = EntityLoad('blogPost');
+	exportSpreadsheet = SpreadsheetNew('Blog Posts');
+&lt;/cfscript>	
+</pre>			
+		</li>
+		<li>
+			Next, once we have our spreadsheet object created we need to add a heading row.  To do this call the SpreadsheetAddRow function and pass it in the exportSpreadhseet object and a comma delimited string of the column headings you want.  For this example the code will look similar to:
+<pre>
+SpreadsheetAddRow(exportSpreadsheet,'ID,Title,Summary,Body,Date Posted');
+</pre>			
+		</li>
+		<li>
+			As this row is a header row we will want to add some styles to denote that.  Using the SpreadsheetFormatRow function we can format the first row so it is Bold and aligned center.  To do this place the following code below the SpreadsheetAddRow call:
+<pre>
+SpreadsheetFormatRow(exportSpreadsheet,{bold=true,alignment='Center'},1);
+</pre>			
+		</li>
+		<li>
+			Once the header is formatted we need to add the remaining data to the spreadsheet.  To do this we need to call SpreadsheetAddRows and pass in the spreadsheetObject, in this case exportSpreadsheet, and an array of data, in this case blogPosts.  The code to do this looks like this:
+<pre>
+SpreadsheetAddrows(exportSpreadsheet,blogPosts);
+</pre>			
+		</li>
+		<li>
+			Now that all the data is in the spreadsheet we need to save the spreadsheet to the server.  To do that we call the spreadsheetWrite function and pass it in the spreadsheetObject, the path of the file we want it to be written to, and if we want it to overwrite the file that might already be there.  In this case we are going to write the file to the servers temp directory and we are going to have it overwrite any file that might already exist with the same name.  To do this we use the following code: 
+<pre>
+SpreadsheetWrite(exportSpreadsheet,getTempDirectory() & 'blogPosts.xls',true);
+</pre>
+		</li>
+		<li>
+			Our completed &lt;cfscript> block should look similar to this:
+<pre>
+&lt;cfscript>
+	blogPosts = EntityLoad('blogPost');
+	exportSpreadsheet = SpreadsheetNew('Blog Posts');
+	SpreadsheetAddRow(exportSpreadsheet,'ID,Title,Summary,Body,Date Posted');
+	SpreadsheetFormatRow(exportSpreadsheet,{bold=true,alignment='Center'},1);
+	SpreadsheetAddrows(exportSpreadsheet,blogPosts);
+	SpreadsheetWrite(exportSpreadsheet,getTempDirectory() & 'blogPosts.xls',true);
+&lt;/cfscript>
+</pre>			
+		</li>
+		<li>
+			Now that the spreadsheet has been created we need to serve it up to the user.  To do this we use a &lt;cfheader> tag and a &lt;cfcontent> tag.  First start with the &lt;cfheader> tag which tells the browser to serve it up inline and what the file name should be.  Place the following code after the closing &lt;/cfscript> tag:
+<pre>
+&lt;cfheader name="Content-Disposition" value="inline; filename=blogPosts.xls" />	
+</pre>			
+		</li>
+		<li>
+			Finally we need to use the &lt;cfcontent> tag what file needs to be served and what type of file it is.  We do this by using the following code which should be placed right after the &lt;cfheader> tag:
+<pre>
+&lt;cfcontent file="#getTempDirectory()#blogPosts.xls" type="vnd.ms-excel" />
+</pre>			
+		</li>
+		<li>
+			Your completed file should look similar to this:
+<pre>
+&lt;cfscript>
+	blogPosts = EntityLoad('blogPost');
+	exportSpreadsheet = SpreadsheetNew('Blog Posts');
+	SpreadsheetAddRow(exportSpreadsheet,'ID,Title,Summary,Body,Date Posted');
+	SpreadsheetFormatRow(exportSpreadsheet,{bold=true,alignment='Center'},1);
+	SpreadsheetAddrows(exportSpreadsheet,blogPosts);
+	SpreadsheetWrite(exportSpreadsheet,getTempDirectory() & 'blogPosts.xls',true);
+&lt;/cfscript>	
+
+
+&lt;cfheader name="Content-Disposition" value="inline; filename=blogPosts.xls" />
+&lt;cfcontent file="#getTempDirectory()#blogPosts.xls" type="vnd.ms-excel" />
+</pre>			
+		</li>
+		<li>
+			In a browser navigate to the /www/admin/content/blog/exportBlog.cfm page.  You might be prompted to download a file if the download does not start automatically.  Open up the excel file and review the data that has been exported.
+		</li>
+	</ol>
+</p>

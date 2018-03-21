@@ -1,0 +1,424 @@
+CFHTTP
+
+<p>
+	Cfhttp makes HTTP calls from your ColdFusion server to an internet address of your choice. It is important to remember that it is the ColdFusion server that will be calling the url, not browser that is calling your ColdFusion page. Think of cfhttp as if you have proxy browser on your server that can send and receive information to any address on the internet. Then imagine that this "virtual browser" on the server can save the information that it receives to a variable, so that it can be manipulated or passed to the user who has called your ColdFusion page.
+</p>
+
+<h2>
+	Making a HTTP call
+</h2>
+
+<p>
+	There are many attributes that the cfhttp tag can take. But the simplest cfhttp call can be done like this:
+</p>
+
+<pre class="prettyprint">
+&lt;cfhttp url="http://cfmumbojumbo.com" method="get" /&gt;
+</pre>
+<p>
+	This is equivalent to you getting on the server, starting the browser of your choice and putting http://cfmumbojumbo.com in the address bar. All the information returned from that http request has been put into a variable called cfhttp. If you dump the cfhttp variable like this:
+</p>
+<pre class="prettyprint">
+&lt;cfhttp url="http://cfmumbojumbo.com" method="get" /&gt;
+&lt;cfdump var="#cfhttp#" /&gt;
+</pre>
+<p>
+	Now you can see all the information about the raw html return (fileContent) as well as the mime type, the header information and status codes. The response body, called filecontent by ColdFusion contains in this case all the raw HTML from the page. If you had pointed the url to a jpg or image file it would return a java byte array.
+</p>
+
+<h2>
+	Commonly used attributes
+</h2>
+
+<p>
+	As of CF 10 there are 30 attributes you can use with cfhttp. For this lesson we will cover the most commonly used ones: 
+</p>
+
+<p>
+	<strong>Method</strong> defines the Http method (sometimes referred to as "verbs") of action to be performed on the URL. The methods that cfhttp understands are GET, POST, HEAD, PUT, DELETE, OPTIONS. The most commonly used verbs are GET and POST. GET retrieves whatever information returns from URL. POST can submit data to the chosen URL (form fields, uploaded files, etc.) and then return the resultant page. OPTIONS will return with information explaining what verbs the web server you are talking to will accept from you. HEAD is another verb, it responds the same as a GET but only returns the meta-information that is in the returning page's header, it will not return the response body (HTML, image, file body, etc.) PUT can upload file on the remote server. DELETE can remove a file on the requested URL. The web server on the URL must be set up for PUT and DELETE.
+</p>
+
+<p>
+	<strong>URL</strong> is the address to which you want to talk. It can be an IP address, hostname, or fully qualified domain name. If you pass URL parameters in the url they will be included in your request. For example <code>url="http://www.myserver.com?id=5&myname=Tim</code> will be passed to the remote server just as if it were typed into a web browser. You can include http:// or https://, if you do not, <code>cfhttp</code> will default to http://. If you include a port number in the URL it will override the port attribute. For example: <code>url="http://www.myserver.com:8088"</code> will connect on port 8088. Remember the ColdFusion server is going to need permissions to talk to the remote server on port 8088, otherwise you may get unexpected results.
+</p>
+
+<p>
+	<strong>File and Path</strong> if you want the response body to be written to a file, use this attribute and give it a file name and path.
+</p>
+<pre class="prettyprint">
+&lt;cfhttp url="cfmumbojumbo.com" path="C:/test" file="test.html" /&gt;
+&lt;!-- Will take the HTML from the web page and write it to C:/test/test.html on your ColdFusion server. --&gt;
+</pre>
+<p>
+	<strong>GetAsBinary</strong> tries to convert the response to binary. This can be set to <code>Auto</code>, Never, No or Yes. Auto will convert the response to binary if it recognizes as properly form binary data, otherwise it will convert it to text. <code>Never</code> will treat all returned data as test regardless of it's true MIME type. GetAsBinary is useful when you are using cfhttp to grab images, zip files or other binary data off other web sites.
+</p>
+<pre class="prettyprint">
+&lt;cfhttp url="http://6e33d2c506c5fcafb083-2091e9475e9ec26fdd926321647b46b0.r56.cf1.rackcdn.com/tim-bennadel.png" 
+</pre>
+<p>
+	<strong>UserName and password</strong> is used when the web page is protected by basic authentication on the web server. Note: these attributes are not useful for a typical web site designed login screen.
+</p>
+
+<p>
+	Result is the name of the variable you want to hold returned results.
+</p>
+
+<p>
+	<ul>
+		<li>
+			<strong>Port</strong is the port number you wish to make the HTTP request through. The server that is your ColdFusion code is running on must have permissions to communicate on this port. Default is port 80.
+		</li>
+		<li>
+			<strong>Timeout</strong> is the value in seconds that the ColdFusion server will wait for a successful response before it considers the request to have failed.
+		</li>
+	</ul>
+</p>
+
+-----------------
+
+<p>
+	CFDocument will take your combination of CFML and HTML and convert it to a PDF. At its simplest you can stick some text between the opening and closing tags of CFDocument (there is currently no built-in CFDocument script equivalent) and it will render a PDF to the screen. Here is some sample code:
+</p>
+
+<h2>
+	Creating a simple PDF
+</h2>
+
+<pre class="prettyprint">
+&lt;cfdocument format="PDF"&gt;
+   &lt;cfoutput&gt;
+   Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+   &lt;/cfoutput&gt;
+&lt;/cfdocument&gt;
+</pre>
+<h2>
+	What HTML is supported?
+</h2>
+
+<p>
+	I would love to tell you that anything you can produce in a browser will look exactly the same in the CFDocument generated PDF. However, CFDocument currently only supports HTML 4.01, XML 1.0, DOM Level 1 and 2, CSS1 and CSS2. To be fair, the current support level will cover 90% of most HTML generation you attempt to do. There are 76 supported CSS styles see http://help.adobe.com/en_US/ColdFusion/10.0/CFMLRef/WSc3ff6d0ea77859461172e0811cbec22c24-7c21.html for the entire list. Also note that if you have a Word file that you save HTML the resulting PDF will not look anything like the Word document.
+</p>
+
+<h2>
+	Setting page attributes
+</h2>
+
+<p>
+	CFDocument has attributes that allow you to set margins, page size, page orientation and passwords.
+</p>
+<pre class="prettyprint">
+&lt;!-- These attributes will create a password protected legal sized PDF with the following characteristics
+Bottom Margin: 2.0 inches
+Top Margin: 1 inch
+Left Margin: 1/2 inch
+Right Margin: 1 1/2 inch
+User Password: secret123
+Encrypted: 128-bit encryption
+--&gt;
+&lt;cfdocument format="PDF" pagetype="legal" marginbottom="2.0" margintop="1.0" marginleft="0.5" marginright="1.5" userpassword="secret123" encryption="128-bit"&gt;
+   &lt;cfoutput&gt;
+   Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+   &lt;/cfoutput&gt;
+&lt;/cfdocument&gt;
+</pre>
+
+<h2>
+	Headers, Footers & Page Breaks using CFDocumentItem
+</h2>
+
+<p>
+	CFDocumentItem can be used to create PDF headers, footers and page breaks. If you are not using CFDocumentSection (covered next) then where you place the CFDocumentItem in your HTML will make a difference as to how it effects the entire document.
+</p>
+<pre class="prettyprint">
+&lt;cfdocument format="PDF"&gt;
+&lt;cfoutput&gt;
+	&lt;cfdocumentitem type="header"&gt;
+	    &lt;h1 style="text-align:center;"&gt;BIG FANCY HEADER&lt;/h1&gt;
+	&lt;/cfdocumentitem&gt;
+	Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+	&lt;cfdocumentitem type="pagebreak"/&gt;
+	Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+	&lt;cfdocumentitem type="footer"&gt;
+	    &lt;h1 style="text-align:center;"&gt;Page #cfdocument.currentPageNumber# of #cfdocument.totalPageCount#&lt;/h1&gt;
+	&lt;/cfdocumentitem&gt;
+&lt;/cfoutput&gt;
+&lt;/cfdocument&gt;
+</pre>
+<h2>
+	CFDocumentSection
+</h2>
+
+<p>
+	Sometimes you may want to create a PDF that has does not have the same header and footer for every single page (like a title page) or you may have few pages that need different margins. To deal with this you can use CFDocumentsection, which puts your HTML content into separate blocks, each of which can have their own settings for margins, headers and footers defined in a CFDocumentItem nested in that CFDocumentSection.
+</p>
+<pre class="prettyprint">
+&lt;cfdocument format="PDF"&gt;
+&lt;cfoutput&gt;
+	&lt;!-- Section 1 ---&gt;
+	&lt;cfdocumentsection name="bookmark1"&gt;
+	    <&lt;fdocumentitem type="header"&gt;
+	    &lt;h1 style="text-align:center;"&gt;BIG FANCY HEADER&lt;/h1&gt;
+	    &lt;/cfdocumentitem&gt;
+	    Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+	    &lt;cfdocumentitem type="footer"&gt;
+	    &lt;h1 style="text-align:center;"&gt;Page #cfdocument.currentPageNumber# of #cfdocument.totalPageCount#&lt;/h1&gt;
+	    &lt;/cfdocumentitem&gt;
+	&lt;/cfdocumentsection&gt;
+	
+	&lt;!-- Section 2 ---&gt;
+	&lt;cfdocumentsection name="bookmark2"&gt;
+	    &lt;cfdocumentitem type="header"&gt;
+	    &lt;h1 style="text-align:center;"&gt;2nd page header&lt;/h1&gt;
+	    &lt;/cfdocumentitem&gt;
+	    Bacon ipsum dolor sit amet sirloin fatback #dateformat(now(), "short")#
+	    &lt;cfdocumentitem type="footer"&gt;
+	    &lt;h1 style="text-align:center;"&gt;Page #cfdocument.currentPageNumber# of #cfdocument.totalPageCount#&lt;/h1&gt;
+	    &lt;/cfdocumentitem&gt;
+	&lt;/cfdocumentsection&gt;
+&lt;/cfoutput&gt;
+&lt;/cfdocument&gt;
+</pre>
+<h2>
+	Tips for working with CFDocument
+</h2>
+
+<p>
+	If you find that your application must make a lot of use of CFDocument here are some tips for improving performance and rendering.
+</p>
+
+<p>
+	Avoid using relative file paths:
+</p>
+<pre class="prettyprint">
+&lt;!-- Don't use these below --&gt;
+&lt;link rel="stylesheet" type="text/css" src="../assets/mainStyle.css"&gt;
+&lt;img src="../images/mypic.png"&gt;
+
+&lt;!-- INSTEAD use expand path to provide the full path to the file --&gt;
+&lt;link rel="stylesheet" type="text/css" src="#expandPath('../assets/')#mainStyle.css"&gt;
+&lt;img src="#expandPath('../images/')#mypic.png"&gt;
+</pre>
+
+<p>
+	Set the localURL attribute to yes. When you set this attribute of CFDocument to true it tells ColdFusion to retrieve image files directly from the server rather by attempting to use http.
+</p>
+
+
+CFPDF
+
+
+<p>
+	Whereas, CFDocument is used to create PDFs, the CFPDF tag is used to manipulate existing PDFs. With CFPDF you can read and existing PDF, write meta-data to it, merge PDFS together, delete pages, create thumbnails of the pages, extract text & images, add or remove watermarks, manipulate headers & footers, create PDF portfolios and deal with PDF passwords, permissions and Encryption.
+</p>
+
+
+<h2>
+	Reading a PDF
+</h2>
+
+<p>
+	The CFPDF tag accepts an action property which currently has 18 possible values. Choosing the 'read' action will take an existing PDF, read it to memory and store it in variable name of your choosing.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="read" name="myDoc" source="C:\docs\mypdf.pdf" /&gt;
+&lt;cfdump var="#myDoc#" /&gt;
+</pre>
+<p>
+	The above code will dump out the metadata for the chosen PDF such as the Author, date created, keywords etc. This is the same information you would receive if you used the action="getinfo" argument, however with the getInfo action you can access the values of resulting operation. If you wanted to display the PDF to the browser the following code could be used:
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="read" name="myDoc" source="C:\docs\mypdf.pdf" /&gt;
+&lt;cfcontent variable="#toBinary(myDoc)#" type="application/pdf" /&gt;
+</pre>
+<h2>
+	Creating Thumbnails of PDF pages
+</h2>
+<pre class="prettyprint">
+&lt;cfpdf action="read" name="myDoc" source="C:\docs\mypdf.pdf" /&gt;
+&lt;cfpdf action="thumbnail" source="myDoc" destination="C:\docs\" overwrite="yes" /&gt;
+&lt;cfimage action="read" name="img" source="C:\docs\thumbnail_page_1.jpg" format="jpg" /&gt;
+&lt;cfcontent reset="true" variable="#imageGetBlob(img)#" type="image/jpeg" /&gt;
+</pre>
+<p>
+	The above code will read a PDF, and create 25% scale Jpeg thumbnails for all the pages in the C:\Docs folder. The default naming convention in CF 10 is thumbnail_page_1, thumbnail_page_2, and so on. Format can be set to jpg, tiff, or png. The thumbnail action also has other arguments that work along with it to determine the scale, max breadth, resolution, and naming scheme for the generated thumbnail.
+</p>
+
+<h2>
+	Extracting images
+</h2>
+
+<p>
+	Most images embedded in a PDF can be extracted and saved to folder of your choice, using a file prefix of your choice. By default the file prefix is "cfimage-" and the image number. The default destination is in same folder as the ColdFusion page calling the cfpdf tag.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="extractimage" source="./mypdf.pdf"  overwrite="yes" /&gt; 
+&lt;img src="cfimage-0.jpg" /&gt;
+&lt;br /&gt;
+&lt;img src="cfImage-1.jpg" /&gt;
+</pre>
+<h2>
+	Extracting Text
+</h2>
+
+<p>
+	If you desire to extract the text of a PDF, say to search and catalog words used in the PDF, you can do so with the extractText action. The extractText action will return a XML document each page of text is in it's own XML node name with a co-responding page number. You can then use ColdFusion's powerful XML parsing tags to interact with the XML document. The code below will output the XML from a pdf to the browser for you:
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="extracttext" source="./mypdf.pdf" name="myXML" /&gt;
+&lt;cfcontent type="text/xml" /&gt;
+&lt;cfoutput&gt;#myXML#&lt;/cfoutput&gt;
+</pre>
+<h2>
+	Merging PDF Documents
+</h2>
+
+<h3>
+	Merging using a list
+</h3>
+
+<p>
+	There are a variety of ways ColdFusion can merge different PDF documents together. The simplest is to pass a comma delimited list of PDF files, this will append them in the order you list them.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="merge" source="mypdf.pdf,beer.pdf" destination="mergedPDF.pdf" overwrite="yes" /&gt;
+&lt;cfpdf action="read" name="myPDF" source="mergedPDF.pdf" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<h3>
+	Merging using cfPDFParam
+</h3>	
+
+<p>
+	You can also use cfpdfparam tags nested within an opening and closing cfpdf tag, to more finely control the final PDF. The cfpdfParam tag accepts source, pages and password arguments. Pages can choose what page(s) you want to merge into the final document. You can choose one page or a list of page numbers. Password is used for password protected PDFs. The code below will combine two PDFs mypdf.pdf and beer.pdf, however rather than appending it, we will take the first page of mypdf.pdf, then the first page of beer.pdf and then the second page of mypdf.pdf.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="merge"  destination="mergedPDF.pdf" overwrite="yes"&gt;
+    &lt;cfpdfparam source="myPDF.pdf" pages="1" password="test" /&gt;
+    &lt;cfpdfparam source="beer.pdf" /&gt;
+    &lt;cfpdfparam source="myPDF.pdf" pages="2" password="test" /&gt;
+&lt;/cfpdf&gt;
+&lt;cfpdf action="read" name="myPDF" source="mergedPDF.pdf" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<h3>
+	Merging a directory of PDFs
+</h3>
+
+<p>
+	If you use the directory argument on a CFPDF merge action, you can specify a folder that contains multiple pdf and merge them into one PDF. The order strategy is either by name (ascending alphabetical) or time (ascending by file time stamp) Each file in the directory is evaluated if it is a valid PDF readble by ColdFusion, if you have stoponerror="yes" then the CFPDF tag will error if any of the files in the directory are not valid PDFs. If you have stoponerror="no" then any non-pdf files will be skipped.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="merge"  directory="./" orde ascending="yes" stoponerror="false" overwrite="yes" destination="mergedPDf.pdf" /&gt;
+&lt;cfpdf action="read" name="myPDF" source="mergedPDF.pdf" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<h2>
+	Deleting Pages
+</h2>
+
+<p>
+	You can remove a single page or a range of pages using the action="delete" on the CFPDF tag. Specifying a destination is optional for delete actions. If you do not specify a destination the page or pages will be delete from the original source PDF.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="deletepages" pages="2-3" source="mergedPDF.pdf" /&gt;
+&lt;cfpdf action="read" name="myPDF" source="mergedPDF.pdf" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<h2>
+	Creating and Removing Watermarks
+</h2>
+
+<p>
+	To add a watermark to a PDF you can either use an existing watermark from another PDF or an image. If you specify a destination a new PDF will be created with the watermark, otherwise the watermark will be added to the source PDF. By default the watermark is placed in the center of the page.
+</p>
+<pre class="prettyprint">	
+&lt;cfpdf action="addwatermark" source="mypdf.pdf"  image="draft.png" foreground="yes" overwrite="yes" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<p>
+	To modify the positioning of the watermark you can use the rotation and position arguments. Rotation is the number of degrees the watermark image will be turned. The position argument takes Cartesian coordinates, with the top-left corner being the 0,0 position. The code below will put a water mark at a 45 degree angle in the top left corner of the PDF:
+</p>	
+<pre class="prettyprint">
+&lt;cfpdf action="addwatermark" source="mypdf.pdf"  image="draft.png" foreground="yes" overwrite="yes" name="mypdf" rotation="45" position="0,700" opacity="2" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;	
+</pre>	
+<p>
+	Removing a watermark is very simple:
+</p>	
+<pre class="prettyprint">
+&lt;cfpdf action="removewatermark" source="mypdf.pdf" /&gt;	 
+&lt;cfpdf action="read" name="mypdf" source="mypdf.pdf" /&gt;	
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;	
+</pre>
+<h2>
+	Optimizing PDFs
+</h2>
+	
+<p>
+	PDFs like personal lives can accumulate a lot of baggage, to help slim down the file size and speed up the rendering of a PDF you can use the optimize action on the CFPDF tag. The result can be saved to a new file, the original source or a variable. You must also supply the algorithm used to compress the PDF, your choices are Nearest_Neighbour (notice the non-American spelling), bicubic, bilinear.
+</p>	
+
+<p>
+	<ul>
+		<li>
+			Nearest_Neighbour (default) Lossy image quality. Fast Processing
+		</li>
+		<li>
+			bicubic High Quality image, slowest processing
+		</li>
+		<li>
+			bilinear Mid Range Image quality, Mid Range processing speed
+		</li>
+	</ul>
+</p>
+	
+<p>
+	The above guidelines are very general as the both the resultant compression is highly dependent on the actual content of your PDF. In an example PDF built for this chapter, my original PDF was 221 KB, Nearest_Neighbour took it down to 49 KB, bicubic to 47 KB and bilinear to 48 KB
+</p>	
+<pre class="prettyprint">
+&lt;cfpdf action="optimize" source="mypdf.pdf"  overwrite="yes" algo="bilinear" /&gt;
+&lt;cfpdf action="read" name="mypdf" source="mypdf.pdf" /&gt; 
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<p>
+	There are also 12 other arguments which can be passed to CFPDF to remove other PDF features such as attachments, bookmarks, font styling, javascript, etc.
+</p>
+	
+<h2>
+	Headers and Footers
+</h2>	
+
+<p>
+	CFPDF also has actionS called addHeader AND addFooter, which not surprisingly will add a header and a footer to an existing PDF. The header or footer can be simple text or an image.
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="addheader" source="mypdf.pdf" name="mypdf" text="Header Here" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>
+<p>
+	Using the text argument you have access to four dynamic options _LASTPAGELEBEL, _LASTPAGENUMBER, _PAGELABEL AND _PAGENUMBER. So if you wanted your footer to have Page # of # on each page you could use the following code:
+</p>
+<pre class="prettyprint">
+&lt;cfpdf action="addFooter" source="mypdf.pdf" name="mypdf" text="Page _PAGENUMBER of _LASTPAGENUMBER" /&gt;
+&lt;cfcontent variable="#toBinary(myPDF)#" type="application/pdf" /&gt;
+</pre>	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

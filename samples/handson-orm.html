@@ -1,0 +1,468 @@
+<p>
+	In this hands on we are going to create the ORM entities for our Blog Section.
+</p>
+<p>
+	<ol>
+		<li>
+			Open up the /www/application.cfc file in your code editor.
+		</li>
+		<li>
+			Locate the this.sessionTimeout variable decleration on or around line 6.
+		</li>
+		<li>
+			Below this create the following new variables in the this scope:
+			<ul>
+				<li>
+					this.ormEnabled = true
+				</li>
+				<li>
+					this.ormSettings = { 
+						logsql = true,
+						dbcreate="update",
+						cfclocation="com/entity"
+						}
+				</li>
+				<li>
+					this.invokeImplicitAccessor = true;
+				</li>
+			</ul>
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre>
+this.sessionTimeout = CreateTimeSpan(0, 0, 30, 0);
+this.ormEnabled = true;
+this.ormSettings = { 
+					logsql = true,
+					dbcreate="update",
+					cfclocation="com/entity"
+					};
+this.invokeImplicitAccessor = true;	
+</pre>			
+		</li>
+		<li>
+			Go to the onRequestStartFunction and add an ormReload() function call inside of the if statement.  Your code should look similar to this:
+<pre>
+function onRequestStart(string targetPage){
+	if(structKeyExists(url,'reload')){
+		onApplicationStart();
+		ormReload();
+	}
+ }	
+</pre>			
+		</li>
+		<li>
+			Create a new file called blogPost.cfc in the /www/com/entity/ folder.
+		</li>
+		<li>
+			Open up the www/com/entities/blogPost.cfc file in your code editor.
+		</li>
+		<li>
+			Declare the file as a component by adding the component script tags:
+<pre>
+component{
+}	
+</pre>			
+		</li>
+		<li>
+			Add an additional properties to the component declaration, persistent, and set that value to true.  Your code should look similar to this:
+<pre>
+component persistent="true"{
+}	
+</pre>			
+		</li>
+		<li>
+			Inside the component definition enter the following code: 
+<pre>
+property name="id" column="blogpostid" fieldtype="id" generator="increment";
+property name="title" ormtype="text";     
+property name="summary" ormtype="text";
+property name="body" ormtype="text";
+property name="dateposted" ormtype="timestamp";
+property name="createdDateTime" ormtype="timestamp"; 
+property name="modifiedDateTime" ormtype="timestamp"; 
+property name="deleted" ormtype="boolean";
+
+property name="comments" fieldtype="one-to-many" cfc="blogComment" fkcolumn="blogpostid" cascade="delete"; 	
+</pre>			
+		</li>
+		<li>
+			Create a new file called blogComment.cfc in the /www/com/entity/ folder.
+		</li>
+		<li>
+			Add the following code to the file:
+<pre>
+component persistent="true"{
+	property name="id" column="blogCommentid" fieldtype="id" generator="increment";
+	property name="author" ormtype="string";     
+	property name="comment" ormtype="text";
+	property name="createdDateTime" ormtype="timestamp"; 
+	property name="deleted" ormtype="boolean";
+	
+	property name="blog" fieldtype="many-to-one" cfc="blogPost";    
+ 		
+}	
+</pre>			
+		</li>
+	</ol>
+</p>
+
+<p>
+	In this hands on we are going to add the list and create functionality in the Admin for the blog  posts and categories.
+</p>
+<p>
+	<ol>
+		<li>
+			Open up the /www/admin/content/blog/editBlogPost.cfm file in your code editor.
+		</li>
+		<li>
+			Locate the Edit Entity comment tag on or around line 38.
+		</li>
+		<li>
+			Load the entity into a blogPost variable by adding the following code:
+<pre>
+&lt;cfset blogPost = EntityLoad('BlogPost',form.id,true) /&gt;
+</pre>			
+		</li>
+		<li>
+			Set the blog post properties from the form scope by adding the following lines of code below the &lt;cfset>:
+<pre>
+&lt;cfset blogPost.title = form.title />
+&lt;cfset blogPost.summary = form.summary />
+&lt;cfset blogPost.body = form.body />
+&lt;cfset blogPost.datePosted = form.datePosted />
+&lt;cfset blogPost.modifiedDateTime = now() />	
+</pre>			
+		</li>
+		<li>
+			Next remove the categories that are already associated with the blog post.  We will add the selected categories back later in the process.  To remove the categories add the following code after the &lt;cfset> tags you just inserted:
+<pre>
+&lt;cfloop array="#blogPost.getCategories()#" index="category">
+	&lt;cfset blogPost.removeCategory(category) />
+&lt;/cfloop>	
+</pre>			
+		</li>
+		<li>
+			Next we need to add the logic to create a new blog post.  Locate the comment tag that reads Create Entity on or around line 51.
+		</li>
+		<li>
+			Create a new blog post object and set it to the blogPost variable by adding the following line of code:
+<pre>
+&lt;cfset blogPost = EntityNew('BlogPost') />
+</pre>			
+		</li>
+		<li>
+			Set the object properties from the form scope by adding the following lines of code bellow the &lt;cfset>:
+<pre>
+&lt;cfset blogPost.title = form.title />
+&lt;cfset blogPost.summary = form.summary />
+&lt;cfset blogPost.body = form.body />
+&lt;cfset blogPost.datePosted = form.datePosted />
+&lt;cfset blogPost.createdDateTime = now() />	
+</pre>			
+		</li>
+		<li>
+			Now that the form data is stored in the respective blogPost object we need to add the categories.  To do so add the following code after the Add Category to Entity comment:
+<pre>
+&lt;cfset category = EntityLoadByPK('blogCategory',categoryID ) />
+&lt;cfset blogPost.addCategory(category) />	
+</pre>			
+		</li>
+		<li>
+			At this point the blogPost object has all the information it needs and will be saved successfully.  The next thing we need to do is pull the blog post information for the edit form.  To do this find the Get Entity Data comment tag.
+		</li>
+		<li>
+			Create a blog Post object using the url variable ID and set it to the blogPost variable by adding the following line of code:
+<pre>
+&lt;cfset blogPost = EntityLoad('BlogPost',url.id, true ) />
+</pre>			
+		</li>
+		<li>
+			Now we need to set the blogPOst properties into the form scope so that they will display in the form.  To do this add the following lines of code below the &lt;cfset> tag:
+<pre>
+&lt;cfset form.id = blogPost.id />	
+&lt;cfset form.title = blogPost.title />
+&lt;cfset form.summary = blogPost.Summary />
+&lt;cfset form.body = blogPost.body />
+&lt;cfset form.datePosted = blogPost.datePosted />
+&lt;cfset form.categories = blogPost.categoryList />
+</pre>			
+		</li>
+		<li>
+			At this point the add/edit process is complete, but before we test it out lets update the listing page to pull the entities.  Open up the /www/admin/content/blog/listblogpost.cfm file in your code editor.
+		</li>
+		<li>
+			Find the comment Pull Blog Posts and add a &lt;cfset> bellow that that calls EntityLoad on ‘blogPost’ and sets the value to a variable called blogPosts.  Do this by adding the following line of code:
+<pre>
+&lt;cfset blogPosts = EntityLoad('BlogPost') />	
+</pre>			
+		</li>
+		<li>
+			Next we need to output the information to the user.  Find the Title comment tag and output the title property of the blogPost object.  Do this by adding the following code below the Title comment tag:
+<pre>
+#blogPost.title#	
+</pre>			
+		</li>
+		<li>
+			We then need to output the datePosted value. To do this add the following line of code below the Date Posted comment tag:
+<pre>
+#blogPost.datePosted#	
+</pre>			
+		</li>
+		<li>
+			The final thing we need to do to complete the listing page is to output the blog post id in the edit link so that the edit page knows which blog post is being edited. To do this append the following line of code to the ID url attribute in the &lt;a> tag under the Edit Post comment: #blogPost.id#
+		</li>
+		<li>
+			The admin is now able to create and edit blogPosts.  Navigate to /www/admin/ in your browser and click on Blog.
+		</li>
+		<li>
+			Click on Add Blog Post and create a new blog. 
+		</li>
+		<li>
+			Go back to the listing page and edit your blog.
+		</li>
+	</ol>
+</p>
+<h2>
+	Homework
+</h2>
+<p>
+	Update the blogCategory files in the admin and create a new blog post that is associated to at least 1 category.
+</p>
+
+<p>
+	In this hands on we are going to update the front end of the web site to pull in the blog information you have entered through the admin.
+</p>
+
+<p>
+	<ol>
+		<li>
+			Open up the /www/blog.cfm file in your code editor.
+		</li>
+		<li>
+			The first thing we need to do is to pull all blog posts.  For this example we are going to pull all of them.  In real life you would only want to pull 10 or so entries per page.  To pull all entries call the EntityLoad function passing in the string ‘blogPost’ and assigning that to a blogPosts variable.  To do this place the following line of code on the first line of the file:
+<pre>
+&lt;cfset blogEntries = EntityLoad('blogPost') />	
+</pre>			
+		</li>
+		<li>
+			Next we need to loop over the objects and output them.  To do this we will use a &lt;cfloop> tag.  Locate the Blog Posts comment and add the following line of code below it:
+<pre>
+&lt;cfloop array="#blogPosts#" index="blogPost">	
+</pre>			
+		</li>
+		<li>
+			Place the closing &lt;/cfloop> tag before the second &lt;h5> tag, on or around line x.
+		</li>
+		<li>
+			Delete the two other blog posts entries so that your code looks similar to this:
+<pre>
+&lt;div class="left">
+	&lt;!--- Blog Posts --->
+	&lt;cfloop array="#blogPosts#" index="blogPost">
+      	&lt;h5>&lt;a href=" blogpost.cfm?id=">WebSocket example with keyword highlighting&lt;/a> &lt;span>8/6/2012 &lt;/span> &lt;/h5>
+      	&lt;p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar erat eu metus egestas ut aliquet ante adipiscing. Maecenas eget laoreet dolor. Pellentesque sagittis nisl ac nulla semper facilisis pulvinar elit scelerisque. Nulla mollis fermentum eros a pulvinar. Mauris faucibus fringilla dolor, ut consectetur orci euismod eget. Phasellus ut dui ut tellus aliquam feugiat id at elit. Nulla facilisi. Suspendisse.&lt;/p>
+      	&lt;p>
+      		Categories: ColdFusion Comments: 12
+      	&lt;/p>
+	&lt;/cfloop>
+&lt;/div>	
+</pre>			
+		</li>
+		<li>
+			Before we proceed lets wrap the &lt;cfloop> block with a &lt;cfoutput> so that the data will be output to the screen.
+		</li>
+		<li>
+			We now need to start replacing the placeholder information with the variables from our blogPost object.  First lets append the ID to the url so that we can view the more detailed blog post later.  Update the href attribute of the &lt;a> tag and append #blogPost.id# to the link.  The link should now read: blogpost.cfm?id=#blogpost.id#.
+		</li>
+		<li>
+			Next, replace the contents of link with the blog title, which is #blogpost.title#
+		</li>
+		<li>
+			We then need to replace the date with the blog post’s date.  We are going to use the dateformat function to clean up the date and make it more presentable.  To do this replace the date with the following code:
+<pre>
+#dateformat(blogPost.datePosted,'mm/dd/yyyy')#	
+</pre>			
+		</li>
+		<li>
+			We now need to replace the summary information.  Do this by replaceing the contents of the first &lt;p> tag with #blogPost.summary#
+		</li>
+		<li>
+			In the next &lt;p> tag, replace the word ColdFusion with #blogpost.categories#.  This will output all categories the blog post is associated to.
+		</li>
+		<li>
+			The final thing we need to do is to output the number of comments that the blog post has.  To do this we will call the getComments() function on the blogPost object and use the arrayLen function to count how many entries were returned.  Do do this replace the number 12 with the following code:
+<pre>
+#arrayLen(blogPost.getComents())#
+</pre>			
+		</li>
+		<li>
+			Go to the /www/blog.cfm page in your browser and confirm that you now see all your blog posts listing on the page.
+		</li>
+		<li>
+			Next we need to update the blog post detail page to display the relevant blog post information.  Open up the /www/blogpost.cfm file in your code editor.
+		</li>
+		<li>
+			At the top of the file load in the blog post object and set it to a variable called blogPost.  To do this use the following code:
+<pre>
+&lt;cfset blogPost = EntityLoad('blogPost',url.id,true) />	
+</pre>			
+		</li>
+		<li>
+			Next we need to replace the place holder content with the real content.  To do this locate the &lt;h2> tag and replace its content with #blogPost.title#.
+		</li>
+		<li>
+			Next replace the date with #dateformat(blogPost.dateposted,’mm/dd/yyyy’)#.
+		</li>
+		<li>
+			Once that is complete we need to replace the blog body placeholder text.  This is the next 5 &lt;p> tags.  Delete these and replace them with #blogPost.body#.
+		</li>
+		<li>
+			The last thing we need to do is to put the blog post’s ID value into the Export to PDF link.  Append the following code to the hef value of the &lt;a> tag:
+<pre>
+#blogPost.id#
+</pre>			
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre>
+&lt;h2>
+	#blogPost.title#
+&lt;/h2>
+&lt;p>
+	&lt;strong>Date Postedv/strong>: #dateformat(blogPost.datePosted,'mm/dd/yyyy')#
+&lt;/p>
+#blogPost.body#
+&lt;p>
+	&lt;a href="exportToPDF.html?id=#blogPost.id#" target=”_new”>Export to PDF&lt;/a>
+&lt;/p>
+&lt;h3>
+	Comments (1)
+&lt;/h3>	
+</pre>			
+		</li>
+		<li>
+			Next we need to output how many comments the blog has.  To do this we will do the same thing we have done previously by using the arrayLen function.  Replace the number 1 with the following code:
+<pre>
+#arrayLen(blogPost.getComments())#	
+</pre>			
+		</li>
+		<li>
+			We now need to loop over the comments and output them.  To do this we will use a &lt;cfloop> tag. Just Before the first &lt;li> tag, create a &lt;cfloop> tag with the following attributes:
+			<ul>
+				<li>
+					array="#blogPost.getComents()#"
+				</li>
+				<li>
+					index="comment"
+				</li>
+			</ul>
+		</li>
+		<li>
+			Place a closing &lt;/cfloop> tag after the first closing &lt;/li> tag and remove the other &lt;li> block.
+		</li>
+		<li>
+			The comment object will now be available in the comment variable.  Replace the date with the following code:
+<pre>
+#dateFormat(comment.createdDateTime,'mm/dd/yyyy')#	
+</pre>			
+		</li>
+		<li>
+			Replace the time with the following code: 
+<pre>
+#timeformat(comment.createdDateTime,'short')#	
+</pre>			
+		</li>
+		<li>
+			Replace ‘Simon Free’ with the following code:
+<pre>
+#comment.author#	
+</pre>			
+		</li>
+		<li>
+			And finally, replace the placeholder text in the &lt;p> tag with the following code:
+<pre>
+#comment.comment#	
+</pre>			
+		</li>
+		<li>
+			Your code should look similar to this:
+<pre>
+&lt;ul>
+	&lt;cfloop array="#blogPost.getComents()#" index="comment">
+	&lt;li>
+		&lt;p>
+			Posted On: #dateFormat(comment.createdDateTime,'mm/dd/yyyy')# at #timeformat(comment.createdDateTime,'short')# By #comment.author#
+		&lt;/p>
+		&lt;p>
+			#comment.comment#
+		&lt;/p>
+		&lt;div class="clr hline">&nbsp;&lt;/div>
+	&lt;/li>
+	&lt;/cfloop>
+&lt;/ul>	
+</pre>			
+		</li>
+		<li>
+			If you were to run this page now you would see no comments as there are no comments in the system.  The next thing we need to do is to allow users to submit comments.  Go to the top of the file and create a &lt;cfparam> tag with the following attributes:
+			<ul>
+				<li>
+					Name = form.submitted
+				</li>
+				<li>
+					Default=0
+				</li>
+			</ul>
+		</li>
+		<li>
+			Next, we will add the logic to save the comment, only if the form has been submitted.  We check if the form has been submitted by looking at the form.submitted value.  After the &lt;cfset> tag on or around line 2 create a &lt;cfif> tag which checks if form.submitted is true.  Your code should look similar to this:
+<pre>
+&lt;cfparam name="form.submitted" default="0" />
+&lt;cfset blogPost = EntityLoad('blogPost',url.id,true) />
+&lt;cfif form.submitted>
+	
+&lt;/cfif>	
+</pre>			
+		</li>
+		<li>
+			Inside the &lt;cfif> block, create a new instance of the blogComment entity and set the author and comment values from the form scope.  Your code should look similar to this:
+<pre>
+&lt;cfset comment = entityNew('blogComment') />
+&lt;cfset comment.author = form.author />
+&lt;cfset comment.comment = form.comment />	
+</pre>			
+		</li>
+		<li>
+			Next we will set the createdDateTime value using the now() function and we will add the comment to the blogPOst object.  Your code should look similar to this:
+<pre>
+&lt;cfset comment = entityNew('blogComment') />
+&lt;cfset comment.author = form.author />
+&lt;cfset comment.comment = form.comment />
+&lt;cfset comment.createdDateTime = now() />
+&lt;cfset blogPost.addComment(comment) />	
+</pre>			
+		</li>
+		<li>
+			Now that we have created the comment and added it to the blog post we need to save these changes.  This is done by calling entitySave on the blogPost object.  Add the following line of code after your last &lt;cfset> tag:
+<pre>
+&lt;cfset EntitySave(blogPost) />	
+</pre>			
+		</li>
+		<li>
+			Your final code block should look similar to this:
+<pre>
+&lt;cfif form.submitted>
+	&lt;cfset comment = entityNew('blogComment') />
+	&lt;cfset comment.author = form.author />
+	&lt;cfset comment.comment = form.comment />
+	&lt;cfset comment.createdDateTime = now() />
+	&lt;cfset blogPost.addComment(comment) />
+	&lt;cfset EntitySave(blogPost) />
+&lt;/cfif>		
+</pre>			
+		</li>
+		<li>
+			Open up the /www/blog.cfm page in your browser.  Navigate to a blog post and enter a comment.  You should now see your comment displayed in the comment section.
+		</li>
+	</ol>
+</p>

@@ -1,0 +1,466 @@
+<h1>Code Reuse</h1>
+<h6>By Emily Christiensen</h6>
+
+<p>
+	One acronym that is thrown around in programming circles is DRY: Don't Repeat Yourself. Does anyone enjoy reading a repetitive book? Listening to the same five songs on the radio station? How about writing the same piece of code, over and over again? Performing the same task over and over again is mind-numbing and soul-crushing work. When working in a large system, it's much more fun to write a piece of code in such a way that it can be used multiple times.
+</p>
+<p>
+	Now that some of the basics of programming with ColdFusion have been covered, we can take a moment to discuss code reuse. Writing code that can be used again is an important skill for developers to master; not only does it save time, but it forces the developer to structure their code such that individual routines are isolated and labelled properly. Doing this makes the code easier to read and interpret. In this chapter, simple examples will be used; you can extrapolate from these examples and imagine the effects on a larger scale.
+</p>
+<p>
+	Let's pretend I have a ColdFusion page. The function of this page is to display a greeting. The code would look something like this:
+</p>
+<pre class="prettyprint">
+&lt;cfparam name = "firstName" default = "Emily" /&gt;
+&lt;cfparam name = "lastName" default = "Christiansen" /&gt;
+
+&lt;cfset fullName = firstName & " " & lastName /&gt;
+
+&lt;cfoutput&gt;
+    Hello, #fullName#!
+&lt;/cfoutput&gt;
+</pre>
+<p>
+	This code doesn't do much; it takes the first name and last name, concatenates them to make the full name, then outputs it to the screen. What if we wanted to isolate that piece of code that makes the full name and use it over and over again throughout the system? ColdFusion offers several ways to structure your code for reuse. As the language has grown and evolved over the years, it has gone from simple inclusion of files, to making individual functions, and finally embracing object-oriented programming principles. It also offers the ability to create your own custom tags. When discussing code reuse, functions are the simplest place to start.
+</p>
+
+<h2>
+	Functions
+</h2>
+<p>
+	Functions are reusable blocks of code that have a name, may take in arguments, perform some operations on those arguments, and may return a new value. Breaking complex tasks into smaller, clearly labelled functions will also make them easier to read and comprehend. Functions can be thought of as building blocks for a program.
+</p>
+<p>
+	In ColdFusion, functions are created using the <code>&lt;cffunction&gt;</code> tag. A simple function stub would like like this:
+</p>   
+<pre class="prettyprint">
+&lt;cffunction name="myFunction" output="false" access="public" returnType="void"&gt;
+&lt;/cffunction&gt;
+</pre>
+<p>
+Obviously, this function does nothing right now. Before moving on let’s take a moment and go through the tag’s attributes.
+</p>
+<p>
+	<ul>
+		<li>Name: The name of the function. This should be short, but as descriptive as possible.</li>
+		<li>Output: In some cases, you may want your function to be processed as if it were in a tag, which would display any whitespace and output. If so, set this attribute to true. Most functions are used for processing, not display, so you'll probably want to use false most of the time.</li>
+		<li>Access: This controls who can see your function. If it’s public, it can be called from anywhere else in the system. If it is private, only functions within the same component can call the function. Package visibility is similar to private, but allows components that are within the same package to use those functions. Remote grants web services the ability to call that function. Components will be discussed later in the chapter.</li>
+		<li>Return Type: This describes what type of value is returned. If the function returns nothing, this is set to void.</li>
+	</ul>
+</p>
+<p>
+	Now that the stub of the function is created,  it’s time to make it do something. Let’s say we have the name of a person stored in our database. We want to display the person’s first and last name in the interface, but their name is stored in two different fields, first_name, and last_name.
+</p>
+<p>
+	If we already have the first and last names stored in variables, we can pass them into the function as an argument. We can tell our function which arguments to expect by using the <code>&lt;cfargument /&gt;</code> tag.
+</p>
+<p>
+	For example, the first name would look like this:
+</p>
+<pre class="prettyprint">
+&lt;cfargument name="firstName" type="string" required="false" default=""/&gt;
+</pre>
+<p>
+	As you can see, the tag takes several attributes of its own.
+</p>
+<p>
+	<ul>
+		<li>Name: Clear and concise names of your arguments.</li>
+		<li>Type: Denotes the type for the argument. In our example above, it is a string.</li>
+		<li>Required: Denotes whether or not the argument is required. If you set this to false, make sure you perform checks to ensure that it exists before using it!</li>
+		<li>Default: If the argument is not required and not passed in, this value will be used. This eliminates the problem of using an argument that doesn’t exist. It will not be used if the argument is required.</li>
+	</ul>
+</p>	
+<p>
+	The function stub now looks like the example below once we add the arguments:
+</p>
+<pre class="prettyprint">
+&lt;cffunction name="getFullName" output="false" access="public" returnType="void"&gt;
+     &lt;cfargument name="firstName" type="string" required="false" default=""/&gt;
+     &lt;cfargument name="lastName" type="string" required="false" default=""/&gt;
+
+&lt;/cffunction&gt;
+</pre>
+<p>
+	Take note that the name of the function was changed.  The name is much more descriptive of what it actually does; this is an example of refactoring, the process of refining code.
+</p>
+<p>
+	If we want to access the firstName and lastName variables, we will need to look in the arguments scope. This is one of the many scopes provided by ColdFusion. Variables in the arguments scope exist only for the function in which they are declared. You can access them by using <code>arguments.yourVariableHere.</code>
+</p>
+<p>
+	Let’s put this to use in the function:
+</p>
+<pre class="prettyprint">	
+&lt;cffunction name="getFullName" output="false" access="public" returnType="void"&gt;
+    &lt;cfargument name="firstName" type="string" required="false" default=""/&gt;
+    &lt;cfargument name="lastName" type="string" required="false" default=""/&gt;
+
+    &lt;cfset fullName = arguments.firstName & " " & arguments.lastname /&gt;
+
+&lt;/cffunction&gt;
+</pre>
+<p>
+	Even though the string is constructed, the fullName variable does not belong to a scope. We need to make sure that only this function can access fullName, so we will var scope it like so:
+</p>
+<pre class="prettyprint">
+&lt;cfset var fullName = arguments.firstName & " " & arguments.lastName /&gt;
+</pre>
+<p>
+	Now that the new variable is scoped, we can now return the variable. To do so, use the <code>&lt;cfreturn /&gt;</code> tag. Since the function is now returning something, we also need to change the returnType attribute in the <code>&lt;cffunction&gt;</code> tag. Because we are only returning a string, we will just set it to string. Functions can return pretty much anything you want them to, including structs and objects.
+</p>
+<p>
+	In the end, the function ends up looking like this:
+</p>
+<pre class="prettyprint">
+&lt;cffunction name="getFullName" output="false" access="public" returnType="string"&gt;
+    &lt;cfargument name="firstName" type="string" required="false" default=""/&gt;
+    &lt;cfargument name="lastName" type="string" required="false" default=""/&gt;
+
+    &lt;cfset var fullName = arguments.firstName & " " & arguments.lastname /&gt;
+
+    &lt;cfreturn fullName /&gt;
+&lt;/cffunction&gt;
+</pre>
+<p>
+	The function is now built, albeit a very simple one. It is concise and clearly labelled, meaning that it is easy to read and reuse elsewhere in the system.
+</p>
+<p>
+	Now, the question is how to allow people to use it.  Fortunately, calling functions in ColdFusion is only a little different than setting up any other variable. We use the <code>&lt;cfset /&gt;</code> tag.
+</p>
+<pre class="prettyprint">
+&lt;cfset fullName = getFullName(firstName="Emily", lastName="Christiansen") /&gt;
+</pre>
+<p>
+	When it comes to passing in arguments, there are a few ways you can do it. Above,  the arguments are explicitly named going into the function. This is particularly useful for functions that have a large number of arguments, as it is far easier to keep track of what actually got passed in. Alternatively, something like this could have been done:
+</p>
+<pre class="prettyprint">
+&lt;cfset fullName = getFullName("Emily", "Christiansen") /&gt;
+</pre>
+<p>
+	This approach relies on the arguments being passed in the same order in which they are specified in the method signature above. It can get very confusing for functions with large numbers of arguments.
+</p>
+<p>
+	Another option is available if working within one function and sending the same arguments to a helper function. For example, the getFullName function could be used by another, larger function. Let’s call it getGreeting:
+</p>
+<pre class="prettyprint">
+&lt;cffunction name="getGreeting"  output="false" access="public" returnType="string"&gt;
+    &lt;cfargument name="firstName" type="string" required="false" default=""/&gt;
+    &lt;cfargument name="lastName" type="string" required="false" default=""/&gt;
+
+    &lt;cfset var fullName = getFullName(argumentCollection=arguments) /&gt;
+
+    &lt;!--- We can do more stuff with the fullName variable here ---&gt;
+
+&lt;/cffunction&gt;
+</pre>
+<p>
+	In the above example, <code>argumentCollection = arguments</code> was used to pass the same arguments from one function to another. This is very handy when passing a bunch of arguments to another functions with the same argument names. This is much faster than typing out the names of each and every argument.
+</p>
+<p>
+	In order to call a function, it needs to be put somewhere. There are a number of ways to accomplish this. The simplest way is to put it in a .cfm page and call it.
+</p>
+<pre class="prettyprint">
+&lt;cfset fullName = getFullName(firstName="Emily", lastName="Christiansen") /&gt;
+
+&lt;cfoutput&gt;
+    Hello, #fullName#!
+&lt;/cfoutput&gt;
+
+&lt;cffunction name="getFullName" output="false" access="public" returnType="string"&gt;
+    &lt;cfargument name=”firstName” type=”string” required=”false” default=""/&gt;
+    &lt;cfargument name=”lastName” type=”string” required=”false” default=""/&gt;
+
+    &lt;cfset var fullName = arguments.firstName & " " & arguments.lastname /&gt;
+
+    &lt;cfreturn fullName /&gt;
+&lt;/cffunction&gt;
+</pre>
+<p>
+	Putting the function into the very same .cfm page being used to display our greeting is not very conducive to code reuse.
+</p>
+
+<h2>Including</h2>
+<p>
+	You can also make a new .cfm file and use it as a function library. You can then use the <code>&lt;cfinclude /&gt;</code> tag to include it on any pages that might need it.
+</p>
+<p>
+	<code>&lt;cfinclude /&gt;</code> only has one attribute, template, that takes the path to the function library file.  If the function is placed in a file called greetingCustomizer.cfm, to give our page access to the function we just include our greeting customizer on the page like so:
+</p>
+<pre class="prettyprint">
+&lt;cfinclude template="path/to/libraries/greetingCustomizer.cfm" /&gt;
+</pre>
+<p>
+	The rest of the page remains unchanged. What it actually does is treat the code that is in the included file as if it were on the page itself. Doing so grants the included template access to all of the variables on the including page. On the surface, it might seem like a good idea, but we will get into why it can actually make code very messy in a little while. In the meantime, once we've included greetingCustomizer.cfm on our page, it will look like this:
+</p>
+<pre class="prettyprint">
+&lt;cfinclude template="path/to/libraries/greetingCustomizer.cfm" /&gt;
+
+&lt;cfset fullName = getFullName(firstName="Emily", lastName="Christiansen") /&gt;
+
+&lt;cfoutput&gt;
+    Hello, #fullName#!
+&lt;/cfoutput&gt;
+</pre>
+<p>
+	While <code>&lt;cfinclude /&gt;</code> is an extremely simple approach, it does have some drawbacks. As mentioned above, the included file now has access to every variable on the including page, creating the possibility of introducing unnecessary dependencies between the two files. For example, with <code>&lt;cfinclude /&gt;</code>, declaring arguments isn’t really necessary with the function if the values already exist on the page, and less experienced developers might be tempted to leave them out altogether.
+</p>
+<p>
+	displayPage.cfm:
+</p>
+<pre class="prettyprint">
+&lt;cfset firstName = "Emily" /&gt;
+&lt;cfset lastName = "Christiansen" /&gt;
+
+&lt;cfinclude template="path/to/libraries/greetingCustomizer.cfm" /&gt;
+
+&lt;cfset fullName = getFullName() /&gt;
+
+&lt;cfoutput&gt;
+    Hello, #fullName#!
+&lt;/cfoutput&gt;
+</pre>
+<p>
+	greetingCustomizer.cfm:
+</p>
+<pre class="prettyprint">
+&lt;cffunction name=”getFullName” output=”false” access=”public” returnType=”string”&gt;
+
+    &lt;cfset var fullName = firstName & " " & lastName /&gt;
+
+    &lt;cfreturn fullName /&gt;
+&lt;/cffunction&gt;
+</pre>
+<p>
+	Remember that <code>&lt;cfinclude /&gt;</code> embeds the CFML code in greetingCustomizer.cfm into displayPage.cfm, so writing our code this way is perfectly valid. Unfortunately, it opens the door to a lot of confusion. A developer looking at the function by itself has no idea where the firstName and lastName variables came from. If this function is used anywhere else,  those variables will need to be declared on the page or passed into the function. What was done in the example above introduced a dependency; our function no longer stands on its own as an encapsulated block of code. Instead, it can only work in the context of the including page, and the benefits of code reuse are lost. It is very important, then, to make sure that we follow the first example, in which arguments are declared and use the arguments scope to communicate what the function need to our fellow developers.
+</p>
+<h2>Custom Tags</h2>
+<p>
+	For displaying code on the front end, another option is to use a custom tag. Custom tags live in their own directory and are prefixed with "cf_". Putting a custom tag on a cfml page will execute the code contained in the tag as if it had been included on the page itself. Start by creating a new .cfm file to house our custom tag. Let’s call it greeting.cfm. First, check the executionMode of the tag. If the executionMode is "start," that means that the tag is being opened. If executionMode is "end," that means that the tag is being closed. This can be checked by setting up an ‘if’ statement like so:
+</p>
+<pre class="prettyprint">
+&lt;cfif thisTag.executionMode EQ "start"&gt;
+
+&lt;!--- Code to execute when the tag is being opened ---&gt;
+
+&lt;cfelse&gt;
+
+&lt;!--- Code to execute when the tag is being closed ---&gt;
+
+&lt;/cfif&gt;
+</pre>
+<p>
+	Because our example is relatively simple, we will focus on the code to be executed when executionMode is "start."
+</p>
+<p>
+	As before, we will want to build the user's full name, which means we will probably want to pass those into the tag. Setting attributes on the tag as if it were any other ColdFusion tag will accomplish this; these are then stored in the attributes scope. Access  to them is done by using attributes.ourVariableName, as in the example below:
+</p>
+<pre class="prettyprint">
+&lt;cfif thisTag.executionMode EQ "start"&gt;
+
+    &lt;cfset fullName = attributes.firstName & " " & attributes.lastName /&gt;
+
+    &lt;cfoutput&gt;
+          Hello, #fullName#
+    &lt;/cfoutput&gt;
+
+&lt;/cfif&gt;
+</pre>
+<p>
+	Once again, a greeting has been constructed and we’re ready to call the tag on the display page. Back in displayPage.cfm, do the following:
+</p>
+<pre class="prettyprint">
+&lt;cf_greeting firstName="Emily" lastName="Christiansen" /&gt;
+</pre>
+<p>
+	This outputs "Hello, Emily Christiansen" in the browser.
+</p>
+<p>
+	You can also use <code>&lt;cfimport /&gt;</code> to bring multiple tags into your page, and put them in their own namespace. The tag takes only two arguments:
+</p>
+<p>
+	<ul>
+		<li>prefix: This argument contains the prefix that the developer will use to reference the tag. This will replace the standard "cf_"</li>
+		<li>taglib: This is the path to the tag library, relative to the web root.</li>
+		<li>Now we can use the import tag to import several tags, and give them a more descriptive prefix.</li>
+	</ul>
+</p>
+
+<pre class="prettyprint">	
+&lt;cfimport prefix="display" taglib="/path/to/tags" /&gt;
+	
+&lt;display:greeting firstName="Emily" lastName="Christiansen" /&gt;
+</pre>
+<p>
+	Now it's easy to see that the greeting tag belongs in the package called display, which gives us a clue as to what the tag does. It displays the greeting.
+</p>
+
+<h2>Components</h2>
+
+<p>
+	A more modern alternative to <code>&lt;cfinclude /&gt;</code> is to create components. Components in ColdFusion behave similarly to objects in many other programming languages. First, start by creating a new file, called Greeting.cfc. ColdFusion uses .cfc to denote files that are components.
+</p>
+
+<p>	
+	Inside of Greeting.cfc,l add a <code>&lt;cfcomponent /&gt;</code> tag:
+</p>
+<pre class="prettyprint">
+&lt;cfcomponent&gt;
+
+&lt;/cfcomponent&gt;
+</pre>
+<p>
+	It  doesn't do much, but there it is.  If you prefer script over tags, you can write a script-only component, too:
+</p>
+<pre class="prettyprint">
+component {
+}
+</pre>
+<p>
+	The only caveat to script components is that you can not use any tags inside them, and unfortunately, the CFScript language is currently incomplete. There are some tags that you can not use in script. Adobe is chipping away at the list of unavailable tags with each release of ColdFusion, and there is even a community project that adds additional script functionality by simply adding a few CFCs to the right folder of your ColdFusion installation. One popular alternative is to use a tag-based component, but immediately inside it, switch to script. This gives you the opportunity to write a few tag-based functions that wrap up what you need from CF's built in tags so that you can call those tags from your script:
+</p>
+<pre class="prettyprint">
+&lt;cfcomponent&gt;
+    &lt;cfscript&gt;
+    &lt;/cfscript&gt;
+&lt;/cfcomponent&gt;
+</pre>
+<p>
+	Think of this component like a bucket of code that you can carry around. You can hand it to a friend, and she can execute it, or she can hand it to her friend, or give it back to you. She can put more code in the bucket, or read values from it too. Components have properties, both public and private, and methods (functions). Properties are like labels on your bucket. You can read the label, and you can change its value.
+</p>
+<p>
+	For now, let’s add functions to the component.
+</p>
+<pre class="prettyprint">
+component {
+        public string function getFullName (String firstName, String lastName) {
+            var fullName = arguments.firstName && arguments.lastName;
+            return fullName;
+        }
+
+        public string function getGreeting (String firstName, String lastName) {
+
+            var fullName = getFullName(argumentCollection=arguments);
+            var greeting = "Hello, " & fullName;
+
+            return greeting;
+        }
+}
+</pre>
+<p>
+	Suppose we wanted make different types of greetings. Right now, the getGreeting function only allows us to say Hello. What we can do is create a baseGreeting that will be available to all of the functions in the component.
+</p>
+<pre class="prettyprint">
+component {
+        this.baseGreeting = "Hello, ";
+
+        public string function getFullName (String firstName, String lastName) {
+        var fullName = arguments.firstName & " " & arguments.lastName;
+            return fullName;
+        }
+
+        public string function getGreeting (String firstName, String lastName) {
+        var fullName = getFullName(argumentCollection=arguments);
+        var greeting = this.baseGreeting & fullName;
+
+            return greeting;
+        }
+}
+</pre>
+<p>
+	Now the base greeting is available to all of the functions in the component. Additionally, because we have put baseGreeting into the scope, it will also be available to whatever pages or other components call on the Greeting component.
+</p>
+<p>
+	If we want to make baseGreeting unavailable to other pages and components, we can put baseGreeting into the variables scope like so:
+</p>
+<pre class="prettyprint">
+component {
+        variables.baseGreeting = "Hello, ";
+
+        public string function getFullName (String firstName, String lastName) {
+            var fullName = arguments.firstName & " " & arguments.lastName;
+            return fullName;
+        }
+
+        public string function getGreeting (String firstName, String lastName) {
+            var fullName = getFullName(argumentCollection=arguments);
+            var greeting = variables.baseGreeting & fullName;
+
+                return greeting;
+        }
+
+}
+</pre>
+<p>
+	Now that baseGreeting is in the variables scope, it can only be accessed from within the Greeting component. In looking at how to call the functions using the component, there are a few options. The first is using <code>&lt;cfinvoke /&gt;</code>
+</p>
+<pre class="prettyprint">
+&lt;cfobject 
+    component = "Greeting.cfc" 
+    name = "greeting"&gt;
+
+&lt;cfinvoke component="greeting" method="getGreeting" returnVariable="myGreeting"&gt;
+    &lt;cfinvokeargument name="firstName" value="Emily"/&gt;
+    &lt;cfinvokeargument name="lastName" value="Christiansen"/&gt;
+&lt;/cfinvoke&gt;
+
+&lt;cfoutput&gt;
+    #greeting#
+&lt;/cfoutput&gt;
+</pre>
+
+<p>
+	First, <code>&lt;cfobject /&gt;</code> was used to create an instance of our Greeting component. Then, the cfinvoke tag was used to call the getGreeting function. Using <code>&lt;cfobject /&gt;</code> allows us to reuse the greeting component as many times as needed instead of re-instantiating it every time we want to call a function. The first thing you probably noticed about the above section is that it is an awful lot of code to do three things: 1) Instantiate the object 2) Invoke the function 3) Display the result.
+</p>
+<p>
+	Fortunately, there is a way to simplify this process. Let’s start by instantiating our object:
+</p>
+<pre class="prettyprint">
+	&lt;cfset Greeting = CreateObject("Component", "path.to.component.Greeting") /&gt;
+</pre>
+<p>
+	What we’ve done is use ColdFusion’s built in CreateObject function to make an instance of our greeting component. CreateObject takes in two parameters:
+</p>
+<p>
+	<ul>
+		<li>Type: The type of object you want ColdFusion to create. In the example above we are making a component, so we pass in the string "Component." As of ColdFusion 9, this is no longer a required parameter.</li>
+		<li>Component-Name: The path to the component. Unlike the template argument for <code>&lt;cfinclude /&gt;</code>, this argument takes the path to the component with each directory separated by dots instead of slashes. Because of this, it is not necessary to add the .cfc extension on to your file name. If you do, it will interpret the above as file ".cfc" in the folder "Greeting."</li>
+	</ul>
+</p>
+<p>
+	Now that we have the object, we can invoke the function:
+</p>
+<pre class="prettyprint">
+	&lt;cfset myGreeting = Greeting.getGreeting(firstName="Emily", lastName="Christiansen") /&gt;
+</pre>
+<p>
+	Notice how we have switched to a dot notation, similar to our examples of helper functions above. Now we get the sense of the object (the Greeting) doing something (the function). This is far more readable and descriptive than the alternative.
+</p>
+<p>
+	Finally, we can output the results:
+</p>
+<pre class="prettyprint">
+&lt;cfoutput&gt;
+    #myGreeting#
+&lt;/cfoutput&gt;
+</pre>
+<p>
+	Ultimately, our finished, refactored example looks like this:
+</p>
+<pre class="prettyprint">
+&lt;cfset Greeting = CreateObject("Component", "Greeting.cfc") /&gt;
+&lt;cfset myGreeting = Greeting.getGreeting(firstName="Emily", lastName="Christiansen") /&gt;
+&lt;cfoutput&gt;
+    #myGreeting#
+&lt;/cfoutput&gt;
+</pre>
+
+<h2>Conclusion</h2>
+<p>
+	ColdFusion offers a wide variety of way to accomplish code reuse. By leveraging these techniques, you will find your code to be less repetitive and more fun to write. Code reuse is not an end in and of itself; rather, it is a means to another end: maintainability. Having code that is broken up into concise, self-documenting parts enables you to read and interpret code much more quickly.
+</p>	
+	
+	
+	
+	
+	
+	

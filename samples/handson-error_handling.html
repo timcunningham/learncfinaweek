@@ -1,0 +1,174 @@
+<p>
+	In this hands on we are going to create an error and view the error information in the log files.
+</p>
+
+<p>
+	<ol>
+		<li>
+			To be able to view the error information we must first throw an error.  Create a new file in the /www/ folder called throwError.cfm
+		</li>
+		<li>
+			Open up the /www/throwError.cfm file in your code editor.
+		</li>
+		<li>
+			Add the following lines of code:
+<pre>
+&lt;cfoutput>
+	#foo#
+&lt;/cfoutput>	
+</pre>			
+		</li>
+		<li>
+			Open the /www/throwError.cfm page in your browser.  You will see an error that states Variable FOO is undefined.
+		</li>
+		<li>
+			Notice that the error shows you which file is throwing the error and what line number the error is on.
+		</li>
+		<li>
+			Open up your ColdFusion administrator and log in.  The URL for the ColdFusion Administrator is most likely: http://localhost:8500/cfide/administrator/ on a PC and http:localhost/cfide/administrator/ on a Mac.
+		</li>
+		<li>
+			Click on the Log Files link under Debugging & Logging.
+		</li>
+		<li>
+			Click on the ‘Search / View Log File’ button (the first one) for the application.log file.
+		</li>
+		<li>
+			You will notice that the first item on the screen is details regarding the error that was just thrown. The application name column will show the name of the application which threw the error, in this case learncfinaweek.  Also you will see details regarding the error that was just show to you on the screen.  You can see the error message, the file that threw the error and the line number.   When error handling is turned on this information can be very useful when debugging errors.
+		</li>
+		<li>
+			Go back to the Log Files screen.
+		</li>
+		<li>
+			Click on the ‘Delete Log File’ icon (the 4th icon from the left) for the exception.log file.  This will delete the exception log file.
+		</li>
+		<li>
+			Go back to the throwError.cfm file and refresh.
+		</li>
+		<li>
+			Go back to the Log Files screen and you will see the exception.log file is back.
+		</li>
+		<li>
+			Click on the ‘Search / View Log File’ icon (1st on the left) for the exception.log file.
+		</li>
+		<li>
+			The first item in the list will be the error that you generated.  In this view you will see a lot of additional information regarding the error, such as the full Java stack trace.
+		</li>
+	</ol>
+</p>
+
+<p>
+	In this hands on we are going to add an Error Handling solution to our web site.
+</p>	
+
+<p>
+	<ol>
+		<li>
+			Open up the /www/Application.cfc file in your code editor.
+		</li>
+		<li>
+			After the onRequestStart function create a new function called onError.  The function will accept 2 arguments. The first is of type any and is called Exception.  The second is of type String and is called EventName.  Your code should look similar to this:
+<pre>
+function onError( any Exception, string EventName ) {
+	
+}
+</pre>			
+		</li>
+		<li>
+			Inside the function include the file sorry.cfm
+		</li>
+		<li>
+			After the file include place the following code which will email the error information to you:
+<pre>
+var errorEmail = new mail();
+errorEmail.setTo(‘you@domain.com’);
+errorEmail.setFrom(‘system@domain.com’);
+errorEmail.setSubject('An Error has Occured');
+errorEmail.setBody('
+	Message: #arguments.exception.message# &lt;br />
+	Details: #arguments.exception.detail# &lt;br />
+	Type: #arguments.exception.type# &lt;br />
+');
+errorEmail.setType('html');
+errorEmail.send()	
+</pre>			
+		</li>
+		<li>
+			Your function should look similar to this:
+<pre>
+function onError( any Exception, string EventName ) {
+	include "sorry.cfm";
+	var errorEmail = new mail();
+	errorEmail.setTo('you@domain.com');
+	errorEmail.setFrom('system@domain.com');
+	errorEmail.setSubject('An Error has Occured');
+	errorEmail.setBody('
+		Message: #arguments.exception.message# &lt;br />
+		Details: #arguments.exception.detail# &lt;br />
+		Type: #arguments.exception.type# &lt;br />
+	');
+	errorEmail.setType('html');
+	errorEmail.send();
+
+}	
+</pre>			
+		</li>
+		<li>
+			Open up the /www/throwError.cfm file in your browser.  You should now see a sorry page.
+		</li>
+		<li>
+			Open up your ColdFusion Administrator and login. The URL for the ColdFusion Administrator is most likely: http://localhost:8500/cfide/administrator/ on a PC and http:localhost/cfide/administrator/ on a Mac.
+		</li>
+		<li>
+			Click on Mail under Server Settings.
+		</li>
+		<li>
+			Click on the View Undeliverable Mail.
+		</li>
+		<li>
+			The first item in the list should be your error email.  Review the contents of the email which will be sent when an email is thrown.
+		</li>
+		<li>
+			Open up the /www/throwError.cfm file in your code editor.
+		</li>
+		<li>
+			Change the contents of the file to the following code:
+<pre>
+&lt;cfdump value="2" />	
+</pre>			
+		</li>
+		<li>
+			Open up the /www/throwError.cfm file in your browser and notice that an error is thrown.  onError does not catch tag syntax errors.  For that we must rely on the site-wide error handler.
+		</li>
+		<li>
+				Create a new file called sitewideErrorHandler.cfm in the / folder.
+		</li>
+		<li>
+			Open the /sitewideErrorHandler.cfm file in your code editor. 
+		</li>
+		<li>
+			Add the following line of text to the file:
+<pre>
+An error has occurred!
+</pre>			
+		</li>
+		<li>
+			Go back to your ColdFusion Administrator.
+		</li>
+		<li>
+				Click on Settings under Server Settings.
+		</li>
+		<li>
+			Go to the Site-wide Error Handler input and enter the following value:
+<pre>
+/learncfinaweek/sitewideErrorHandler.cfm
+</pre>			
+		</li>
+		<li>
+			Go back to the /www/throwError.cfm page in your browser and refresh.
+		</li>
+		<li>
+			You will not see the message ‘An error has occurred!’.  The site wide error handler had caught the exception and displayed a friendlier message to the user.  You can now find details about the specific error from the server log files.
+		</li>
+	</ol>
+</p>		
