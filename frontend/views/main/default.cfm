@@ -45,7 +45,7 @@
 								</div>	
 							</cfif>	
 							<p>
-								<input type="text" name="email" value="#rc.email#" class="emailInput"/> <input type="submit" name="submit" value="Join" class="btn btn-primary"/>
+								<input type="text" name="email" value="#encodeforhtmlattribute(rc.email)#" class="emailInput"/> <input type="submit" name="submit" value="Join" class="btn btn-primary"/>
 							</p>
 						</form>	
 					<cfelse>
@@ -96,7 +96,7 @@
 								</div>	
 							</cfif>	
 							<p>
-								Email: <input type="text" name="email" value="#rc.email#" />
+								Email: <input type="text" name="email" value="#encodeforhtmlattribute(rc.email)#" />
 							</p>
 							<p>
 								<input type="submit" name="submit" value="Join" class="btn btn-primary"/>
