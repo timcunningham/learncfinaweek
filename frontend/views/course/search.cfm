@@ -2,7 +2,7 @@
 	<div class="page-content shadow">
 		<div class="page-title-name sixteen columns">
 			<div class="page-title-content">
-				<h1>Search Results for "<cfoutput>#rc.keyword#</cfoutput>"</h1>
+				<h1>Search Results for "<cfoutput>#encodeforhtml(rc.keyword)#</cfoutput>"</h1>
 			</div>
 		</div>
 	</div>
@@ -18,3 +18,4 @@
 		</cfoutput>	
 	</div>		
 </section>
+
